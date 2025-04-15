@@ -30,8 +30,10 @@ const resultDOM = document.getElementById("result-container");
 initializeGame();
 
 function initializeGame() {
+  console.log("Initializing game...");
   initializePlayer();
   initializeMap();
+  console.log("Player and map initialized.");
 
   // Initialize UI
   if (scoreDOM) scoreDOM.innerText = "0";
@@ -39,12 +41,25 @@ function initializeGame() {
 }
 
 const renderer = Renderer();
-renderer.setAnimationLoop(animate);
+renderer.setAnimationLoop(() => {
+  try {
+    animate();
+  } catch (error) {
+    console.error("Error in animation loop:", error);
+  }
+});
 
 function animate() {
-  animateVehicles();
-  animatePlayer();
-  hitTest();
-
-  renderer.render(scene, camera);
+  try {
+    animateVehicles();
+    animatePlayer();
+    hitTest();
+    renderer.render(scene, camera);
+  } catch (error) {
+    console.error("Error during animation:", error);
+  }
 }
+
+window.addEventListener('error', (event) => {
+  console.error('Erro capturado:', event.error);
+});

@@ -11,6 +11,7 @@ export const metadata = [];
 export const map = new THREE.Group();
 
 export function initializeMap() {
+  console.log("Initializing map...");
   // Remove all rows
   metadata.length = 0;
   map.remove(...map.children);
@@ -21,10 +22,12 @@ export function initializeMap() {
     map.add(grass);
   }
   addRows();
+  console.log("Map initialized with rows:", metadata);
 }
 
 export function addRows() {
   const newMetadata = generateRows(20);
+  console.log("Generated rows:", newMetadata);
 
   const startIndex = metadata.length;
   metadata.push(...newMetadata);
@@ -76,4 +79,5 @@ export function addRows() {
       map.add(row);
     }
   });
+  console.log("Rows added to map:", metadata);
 }
