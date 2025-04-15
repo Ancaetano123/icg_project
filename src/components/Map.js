@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { generateRows } from "../utilities/generateRows";
-import { Grass } from "./Grass";
+import { Grass } from "./Floor";
 import { Road } from "./Road";
 import { Tree, Bush, Flower } from "./Tree";
 import { Car } from "./Car";
