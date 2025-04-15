@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/road_rumble.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Road Rumble</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Press Start 2P", cursive;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        color: white;
+        text-shadow: 2px 2px 4px #000;
+        overflow: hidden;
+      }
+      #background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('./road_rumble_background.png') no-repeat center center;
+        background-size: cover;
+        filter: blur(5px); /* Blur effect aplicado ao fundo */
+        z-index: 0;
+      }
+      #content {
+        position: relative;
+        z-index: 1; /* Certifique-se de que o conteúdo está acima do fundo */
+        text-align: center;
+      }
+      img.logo {
+        width: 300px;
+        height: auto;
+        margin-bottom: 20px;
+      }
+      p {
+        font-size: 1.5em;
+        margin: 20px 0 0;
+      }
+      .start-button {
+        padding: 15px 30px;
+        font-size: 1.2em;
+        font-family: inherit;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+      .start-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="background"></div>
+    <div id="content">
+      <img src="./road_rumble.png" alt="Road Rumble Logo" class="logo" />
+      <p>Tap to Start</p>
+      <button class="start-button" id="start-button">Start</button>
+    </div>
+    <script>
+      document.getElementById("start-button").addEventListener("click", () => {
+        window.location.href = "/difficulty.html"; // Vai para a página de seleção de dificuldade
+      });
+    </script>
+  </body>
+</html>

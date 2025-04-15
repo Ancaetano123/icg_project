@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/road_rumble.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Road Rumble - Easy</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Press Start 2P", cursive;
+        background-color: #000;
+        color: white;
+        overflow: hidden;
+      }
+      #preloader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #000;
+        z-index: 10;
+      }
+      #game-container {
+        display: none; /* Esconde o jogo até que esteja pronto */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Pré-carregador -->
+    <div id="preloader">
+      <h1>Carregando...</h1>
+    </div>
+
+    <!-- CANVAS DO JOGO -->
+    <div id="game-container">
+      <canvas class="game"></canvas>
+      <div id="controls">
+        <p>Use W, A, S, D para mover e Espaço para pular obstáculos!</p>
+      </div>
+      <div id="score">Pontuação: 0</div>
+      <div id="result-container" style="visibility: hidden;">
+        <div id="result">
+          <h1>Game over!</h1>
+          <p>Pontuação: <span id="final-score"></span></p>
+          <button id="retry">Tentar novamente</button>
+          <button id="back" style="background-color: #f44336; color: white; font-size: 0.9em; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Voltar</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main_easy.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        // Remove o pré-carregador e exibe o jogo
+        document.getElementById("preloader").style.display = "none";
+        document.getElementById("game-container").style.display = "block";
+      });
+
+      document.getElementById("retry").addEventListener("click", () => {
+        location.reload(); // Reinicia o jogo ao clicar em "Tentar novamente"
+      });
+
+      document.getElementById("back").addEventListener("click", () => {
+        window.location.href = "/difficulty.html"; // Volta para o menu de dificuldade
+      });
+    </script>
+  </body>
+</html>
