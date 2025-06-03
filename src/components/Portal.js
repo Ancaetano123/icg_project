@@ -1,4 +1,4 @@
-const THREE = window.THREE;
+import * as THREE from "three";
 import { tileSize } from "../constants";
 
 // Esfera menor, translúcida, cubos com gradiente azul-rosa
@@ -71,10 +71,6 @@ export function Portal(tileIndex) {
   group.userData.torus = sphere;
   group.userData.cubes = cubes;
   group.userData.isPortal = true;
-
-  // Habilita sombras
-  group.castShadow = true;
-  group.receiveShadow = true;
 
   return group;
 }

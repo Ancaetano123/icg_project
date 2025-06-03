@@ -1,5 +1,4 @@
-const THREE = window.THREE;
-// import * as THREE from "three";
+import * as THREE from "three";
 import { metadata as rows } from "./components/Map";
 import { player, position } from "./components/Player";
 import { setCoinProbability } from "./utilities/generateRows";

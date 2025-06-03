@@ -1,4 +1,4 @@
-const THREE = window.THREE;
+import * as THREE from "three";
 import { tilesPerRow, tileSize } from "../constants";
 
 export function Grass(rowIndex) {

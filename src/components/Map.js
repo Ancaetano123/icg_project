@@ -1,5 +1,4 @@
-const THREE = window.THREE;
-// import * as THREE from "three";
+import * as THREE from "three";
 import { generateRows } from "../utilities/generateRows";
 import { Grass } from "./Floor";
 import { Road } from "./Road";

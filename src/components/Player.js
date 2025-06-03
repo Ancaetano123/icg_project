@@ -1,5 +1,4 @@
-const THREE = window.THREE;
-
+import * as THREE from "three";
 import { endsUpInValidPosition } from "../utilities/endsUpInValidPosition";
 import { metadata as rows, addRows } from "./Map";
 import { tileSize } from "../constants"; // Adicione este import se ainda não existir
@@ -20,7 +19,7 @@ export function setGameOver(val) {
 function Player() {
   const player = new THREE.Group();
 
-  // Sombra como filho do player (fixa, não recalculada)
+  // Sombra como filho do player (como estava antes)
   const shadow = new THREE.Mesh(
     new THREE.PlaneGeometry(32, 18),
     new THREE.MeshBasicMaterial({
@@ -30,7 +29,7 @@ function Player() {
       depthWrite: false,
     })
   );
-  shadow.position.set(0, 0, 1.5); // Fixa sempre abaixo do boneco
+  shadow.position.set(0, 0, 1.5);
   shadow.rotation.x = -Math.PI / 2;
   shadow.renderOrder = -1;
   shadow.name = "fixedShadow";

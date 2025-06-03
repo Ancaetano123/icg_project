@@ -1,6 +1,6 @@
-const THREE = window.THREE;
+import * as THREE from "three";
 import { tileSize } from "../constants";
-
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 
 export function Tree(tileIndex, height) {
@@ -29,8 +29,6 @@ export function Tree(tileIndex, height) {
   crown.receiveShadow = true;
   tree.add(crown);
 
-  tree.castShadow = true;
-  tree.receiveShadow = true;
   return tree;
 }
 

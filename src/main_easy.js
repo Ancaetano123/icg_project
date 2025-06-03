@@ -1,4 +1,4 @@
-const THREE = window.THREE;
+import * as THREE from "three";
 import { Renderer } from "./components/Renderer";
 import { Camera } from "./components/Camera";
 import { DirectionalLight } from "./components/DirectionalLight";
@@ -16,19 +16,27 @@ import { createPlayerPreviewModel } from "./components/Player";
 import { superpowers, activateSuperpower, getPurchaseCount, createSuperpowerButtons, updateSuperpowerCounters, useSuperpower, updateSuperpowerButtonStates, lifeSystem, getExtraLives, setExtraLives, useExtraLife, addExtraLife } from "./superpowers";
 
 const scene = new THREE.Scene();
-scene.add(player);
+scene.add(player); // Adiciona o player (com sombra como filho)
 scene.add(map);
 
-// Luz ambiente branca, equilibrada
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.74); // intensidade média
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.6); // cor branca, intensidade aumentada
 scene.add(ambientLight);
 
-// Luz direcional branca, inclinada, com sombras
 const dirLight = DirectionalLight();
-scene.add(dirLight);
+dirLight.intensity = 1.2; // aumenta a intensidade da luz direcional
+dirLight.target = new THREE.Object3D(); // Define um alvo fixo para a luz
+scene.add(dirLight); // Adicione a luz ao scene diretamente
 
 const camera = Camera();
 scene.add(camera); // Sempre adiciona ao scene, nunca ao player
+
+// Atualize a posição inicial da sombra com base na luz direcional
+const shadowPosition = dirLight.position.clone(); // Posição fixa da luz
+function updateShadowPosition() {
+  if (player && player.fixedShadow) {
+    player.fixedShadow.position.set(shadowPosition.x, shadowPosition.y, shadowPosition.z);
+  }
+}
 
 const scoreDOM = document.getElementById("score");
 const resultDOM = document.getElementById("result-container");
@@ -44,7 +52,7 @@ const powerUps = [
     icon: superpowers[0]?.icon || "⚡",
     effect: superpowers[0]?.effect || "speedBoost",
     key: superpowers[0]?.key || 'speedBoost',
-    price: 0
+    price: 15
   },
   { 
     name: superpowers[1]?.name || "Jump",
@@ -52,7 +60,7 @@ const powerUps = [
     icon: superpowers[1]?.icon || "🦘",
     effect: superpowers[1]?.effect || "jump",
     key: superpowers[1]?.key || 'jump',
-    price: 0
+    price: 20
   },
   { 
     name: superpowers[2]?.name || "Shield",
@@ -60,7 +68,7 @@ const powerUps = [
     icon: superpowers[2]?.icon || "🛡️",
     effect: superpowers[2]?.effect || "shield",
     key: superpowers[2]?.key || 'shield',
-    price: 0
+    price: 25
   },
   { 
     name: "Extra Life",
@@ -68,7 +76,7 @@ const powerUps = [
     icon: "❤️",
     effect: "extraLife",
     key: 'extraLife',
-    price: 0
+    price: 30
   }
 ];
 
@@ -312,7 +320,7 @@ let inCustomization = false; // Inicialize como false
 
 // Adicione a criação do renderer e o loop de animação principal
 const renderer = Renderer();
-renderer.setClearColor(0xffffff, 1); // fundo branco puro
+renderer.setClearColor(0x181a20, 1); // Fundo escuro igual ao CSS
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Better shadow quality
 
@@ -1547,7 +1555,8 @@ function animate() {
   coinCatch();
   hitTest();
 
-  // Removido: updateShadowPosition(); // Não é mais necessário, sombra é fixa
+  // Atualize a posição da sombra para ser fixa
+  updateShadowPosition();
 
   // Update magnet effects if active
   if (window.activeMagnetEffect) {
@@ -1667,22 +1676,15 @@ function saveCoinsOnGameOver() {
 window.showGameOverScreen = function() {
   // PRIMEIRO salva as moedas antes de mostrar o game over
   saveCoinsOnGameOver();
-
+  
   const result = document.getElementById("result-container");
   const finalScore = document.getElementById("final-score");
-  const reviveBtn = document.getElementById("revive");
   if (result) {
     result.style.display = "flex";
     result.style.visibility = "visible";
-    // Exibe o botão revive se houver vidas extras
-    if (reviveBtn) {
-      if (getExtraLives() > 0) {
-        reviveBtn.style.display = "block";
-        reviveBtn.innerHTML = `❤️ Revive (${getExtraLives()} lives)`;
-      } else {
-        reviveBtn.style.display = "none";
-      }
-    }
+    
+    // Add revival button if player has extra lives
+    addRevivalButton(result);
   }
   // Atualize a pontuação final se possível
   if (finalScore && typeof window.position === "object" && typeof window.position.currentRow === "number") {
@@ -1690,18 +1692,45 @@ window.showGameOverScreen = function() {
   }
 };
 
-// Lógica do botão revive
-document.addEventListener("DOMContentLoaded", () => {
-  const reviveBtn = document.getElementById("revive");
-  if (reviveBtn) {
-    reviveBtn.onclick = () => {
-      revivePlayer();
-      reviveBtn.style.display = "none";
-    };
+function addRevivalButton(resultContainer) {
+  // Remove existing revival button if any
+  const existingBtn = document.getElementById("revival-btn");
+  if (existingBtn) existingBtn.remove();
+  
+  const extraLives = getExtraLives();
+  if (extraLives <= 0) return; // No lives available
+  
+  // Create revival button
+  const revivalBtn = document.createElement("button");
+  revivalBtn.id = "revival-btn";
+  revivalBtn.innerHTML = `❤️ Revive (${extraLives} lives)`;
+  revivalBtn.style.fontSize = "1.2em";
+  revivalBtn.style.padding = "12px 24px";
+  revivalBtn.style.margin = "20px";
+  revivalBtn.style.background = "#ff4081";
+  revivalBtn.style.color = "white";
+  revivalBtn.style.border = "none";
+  revivalBtn.style.borderRadius = "8px";
+  revivalBtn.style.cursor = "pointer";
+  revivalBtn.style.fontFamily = '"Press Start 2P", cursive';
+  revivalBtn.style.boxShadow = "0 4px 8px rgba(0,0,0,0.3)";
+  revivalBtn.style.transition = "background 0.2s";
+  
+  revivalBtn.onmouseenter = () => revivalBtn.style.background = "#e91e63";
+  revivalBtn.onmouseleave = () => revivalBtn.style.background = "#ff4081";
+  
+  revivalBtn.onclick = () => {
+    revivePlayer();
+  };
+  
+  // Insert before restart button
+  const restartBtn = resultContainer.querySelector("#restart");
+  if (restartBtn) {
+    resultContainer.insertBefore(revivalBtn, restartBtn);
+  } else {
+    resultContainer.appendChild(revivalBtn);
   }
-});
-
-// Remova a função addRevivalButton e chamadas relacionadas
+}
 
 function showRevivalAnimation() {
   // Create revival effect overlay

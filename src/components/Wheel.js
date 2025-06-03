@@ -1,4 +1,4 @@
-const THREE = window.THREE;
+import * as THREE from "three";
 
 export function Wheel(x) {
   const wheel = new THREE.Mesh(
