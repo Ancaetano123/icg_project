@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="./public/road_rumble.png" />
+    <link rel="icon" type="image/png" href="/road_rumble.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Road Rumble</title>
     <style>
@@ -62,13 +62,22 @@
   <body>
     <div id="background"></div>
     <div id="content">
-      <img src="./public/road_rumble.png" alt="Road Rumble Logo" class="logo" />
+      <img src="./road_rumble.png" alt="Road Rumble Logo" class="logo" />
       <p>Tap to Start</p>
       <button class="start-button" id="start-button">Start</button>
     </div>
     <script>
+      // Reset progress when entering the main page
+      localStorage.setItem("totalCoins", "0");
+      localStorage.setItem("extraLives", "0");
+      localStorage.setItem("superpowerPurchases", JSON.stringify({ shield: 0, rocket: 0, magnet: 0 }));
+      localStorage.setItem("superpowerUses", JSON.stringify({ shield: 0, rocket: 0, magnet: 0 }));
+      localStorage.setItem("unlockedSkins", JSON.stringify([true, false, false, false]));
+      localStorage.setItem("selectedSkinIndex", "0");
+      // ...adapte se adicionar mais superpoderes ou skins...
+
       document.getElementById("start-button").addEventListener("click", () => {
-        window.location.href = "./difficulty.html"; // Caminho relativo
+        window.location.href = "/easy.html";
       });
     </script>
   </body>

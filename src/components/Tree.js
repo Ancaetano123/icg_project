@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { tileSize } from "../constants";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 
 export function Tree(tileIndex, height) {
   const tree = new THREE.Group();
@@ -51,46 +53,46 @@ export function Flower(tileIndex) {
   flower.position.x = tileIndex * tileSize;
   flower.position.z = 0; // Ajuste para o nível correto
 
-// Stem (caule)
-const stem = new THREE.Mesh(
-  new THREE.CylinderGeometry(tileSize * 0.05, tileSize * 0.05, tileSize * 0.5, 8),
-  new THREE.MeshLambertMaterial({ color: 0x228b22 }) // Green stem
-);
-stem.rotation.x = Math.PI / 2; // Rotacionar o cilindro para ficar em pé
-stem.position.z = tileSize * 0.25; // Colocar o caule em pé
-stem.castShadow = true;
-stem.receiveShadow = true;
-flower.add(stem);
+  // Stem (caule)
+  const stem = new THREE.Mesh(
+    new THREE.CylinderGeometry(tileSize * 0.025, tileSize * 0.025, tileSize * 0.22, 8),
+    new THREE.MeshLambertMaterial({ color: 0x228b22 }) // Green stem
+  );
+  stem.rotation.x = Math.PI / 2; // Rotacionar o cilindro para ficar em pé
+  stem.position.z = tileSize * 0.11; // Colocar o caule em pé
+  stem.castShadow = true;
+  stem.receiveShadow = true;
+  flower.add(stem);
 
   // Center of the flower (centro)
   const center = new THREE.Mesh(
-    new THREE.SphereGeometry(tileSize * 0.1, 16, 16),
+    new THREE.SphereGeometry(tileSize * 0.045, 16, 16),
     new THREE.MeshLambertMaterial({ color: 0xffff00 }) // Yellow center
   );
-  center.position.z = tileSize * 0.5; // No topo do caule
+  center.position.z = tileSize * 0.22; // No topo do caule
   center.castShadow = true;
   center.receiveShadow = true;
   flower.add(center);
 
   // Petals (pétalas)
-const petalMaterial = new THREE.MeshLambertMaterial({ color: 0xff69b4 }); // Pink petals
-const petalGeometry = new THREE.SphereGeometry(tileSize * 0.1, 8, 8); // Rounded petals
+  const petalMaterial = new THREE.MeshLambertMaterial({ color: 0xff69b4 }); // Pink petals
+  const petalGeometry = new THREE.SphereGeometry(tileSize * 0.045, 8, 8); // Rounded petals
 
-for (let i = 0; i < 6; i++) {
-  const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+  for (let i = 0; i < 6; i++) {
+    const petal = new THREE.Mesh(petalGeometry, petalMaterial);
 
-  // Posicionar as pétalas ao redor do centro, em um plano horizontal
-  petal.position.x = Math.cos((i / 6) * Math.PI * 2) * tileSize * 0.2; // Circular ao redor do centro
-  petal.position.y = Math.sin((i / 6) * Math.PI * 2) * tileSize * 0.2; // Circular ao redor do centro
-  petal.position.z = tileSize * 0.5; // Alinhado com o centro no eixo Z
+    // Posicionar as pétalas ao redor do centro, em um plano horizontal
+    petal.position.x = Math.cos((i / 6) * Math.PI * 2) * tileSize * 0.09; // Circular ao redor do centro
+    petal.position.y = Math.sin((i / 6) * Math.PI * 2) * tileSize * 0.09; // Circular ao redor do centro
+    petal.position.z = tileSize * 0.22; // Alinhado com o centro no eixo Z
 
-  // Inclinar as pétalas para ficarem na horizontal
-  petal.rotation.z = (i / 6) * Math.PI * 2; // Girar as pétalas ao redor do centro
+    // Inclinar as pétalas para ficarem na horizontal
+    petal.rotation.z = (i / 6) * Math.PI * 2; // Girar as pétalas ao redor do centro
 
-  petal.castShadow = true;
-  petal.receiveShadow = true;
-  flower.add(petal);
-}
+    petal.castShadow = true;
+    petal.receiveShadow = true;
+    flower.add(petal);
+  }
   flower.castShadow = true;
   flower.receiveShadow = true;
   return flower;

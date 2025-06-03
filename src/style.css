@@ -2,10 +2,33 @@
 
 body {
   margin: 0;
+  padding: 0;
+  overflow: hidden;
   display: flex;
   font-family: "Press Start 2P", cursive;
-  background-color: #e5e7ec; /* Alterado para um fundo escuro */
+  background-color: #ffff; /* Alterado para um fundo escuro */
   color: #ffffff; /* Alterado para texto azul claro */
+}
+
+canvas.game {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  display: block !important;
+  background: #181a20;
+}
+
+/* Ensure UI elements are above the canvas */
+#score-hud,
+#coin-score,
+#life-hud,
+#sidebar-btns,
+.superpower-buttons {
+  z-index: 1000 !important;
+  position: absolute !important;
 }
 
 #controls {
@@ -23,7 +46,7 @@ body {
   grid-template-rows: auto auto;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 80px; /* Increased significantly to move below game over */
 }
 
 #controls button {
@@ -42,11 +65,11 @@ body {
   position: absolute;
   top: 20px;
   left: 20px;
-
   font-size: 2em;
   color: white;
-  font-family: Arial, sans-serif; /* Alterado para uma fonte diferente */
-  text-shadow: 2px 2px 4px #000; /* Adicionado sombra ao texto */
+  font-family: Arial, sans-serif;
+  text-shadow: 2px 2px 4px #000;
+  display: none; /* Esconde o score antigo */
 }
 
 #result-container {
@@ -54,6 +77,7 @@ body {
   min-width: 100%;
   min-height: 100%;
   top: 0;
+  z-index: 1000; /* Ensure game over appears above superpower buttons */
   display: flex;
   align-items: center;
   justify-content: center;

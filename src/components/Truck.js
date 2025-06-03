@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { tileSize } from "../constants";
 import { Wheel } from "./Wheel";
 
-export function Truck(initialTileIndex, color) {
+export function Truck(initialTileIndex, color, direction = true) {
   const truck = new THREE.Group();
   truck.position.x = initialTileIndex * tileSize;
 
@@ -80,6 +80,10 @@ export function Truck(initialTileIndex, color) {
   const backWheel = Wheel(-35);
   truck.add(backWheel);
   
+  // Inverte o camião se direção for para a esquerda
+  if (direction === false) {
+    truck.scale.x = -1;
+  }
 
   return truck;
 }

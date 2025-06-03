@@ -1,12 +1,21 @@
 import * as THREE from "three";
 import { metadata as rows } from "./components/Map";
-import { player, position } from "./components/Player";
+import { player, position, isGameOver, setGameOver } from "./components/Player";
 import { powerUpEffects } from "./animatePlayer";
 
 const resultDOM = document.getElementById("result-container");
 const finalScoreDOM = document.getElementById("final-score");
 
 export function hitTest() {
+  // Check if player has active shield protection
+  if (player.userData.hasShield && player.userData.shieldActive) {
+    return; // Shield blocks all damage
+  }
+
+  // Não testa colisão se já morreu ou se está teleportando (portal)
+  if (isGameOver) return;
+  if (window.isTeleporting && window.isTeleporting()) return;
+
   const row = rows[position.currentRow - 1];
   if (!row) return;
 
@@ -24,12 +33,17 @@ export function hitTest() {
         if (!resultDOM || !finalScoreDOM) return;
 
         // Show the game over screen and stop further actions
-        resultDOM.style.visibility = "visible";
+        if (typeof window.showGameOverScreen === "function") {
+          window.showGameOverScreen();
+        } else {
+          resultDOM.style.display = "flex";
+          resultDOM.style.visibility = "visible";
+        }
         finalScoreDOM.innerText = position.currentRow.toString();
 
-        // Stop the animation loop
-        const renderer = document.querySelector("canvas.game").__renderer;
-        if (renderer) renderer.setAnimationLoop(null);
+        setGameOver(true); // Bloqueia o jogador imediatamente ao morrer
+
+        // Remove the animation loop stopping logic - let it continue running
       }
     });
   }

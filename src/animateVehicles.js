@@ -16,16 +16,18 @@ export function animateVehicles() {
       rowData.vehicles.forEach(({ ref }) => {
         if (!ref) throw Error("Vehicle reference is missing");
 
-        if (rowData.direction) {
-          ref.position.x =
-            ref.position.x > endOfRow
-              ? beginningOfRow
-              : ref.position.x + rowData.speed * delta;
-        } else {
+        if (rowData.direction === false) {
+          // Direita para esquerda (frente para X negativo)
           ref.position.x =
             ref.position.x < beginningOfRow
               ? endOfRow
               : ref.position.x - rowData.speed * delta;
+        } else {
+          // Esquerda para direita (frente para X positivo)
+          ref.position.x =
+            ref.position.x > endOfRow
+              ? beginningOfRow
+              : ref.position.x + rowData.speed * delta;
         }
       });
     }

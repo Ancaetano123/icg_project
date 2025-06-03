@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+let followPlayer = false;
+
 export function Camera() {
   const size = 300;
   const viewRatio = window.innerWidth / window.innerHeight;
@@ -18,6 +20,20 @@ export function Camera() {
   camera.up.set(0, 0, 1);
   camera.position.set(300, -300, 300);
   camera.lookAt(0, 0, 0);
+
+  camera.userData.followPlayer = () => { followPlayer = true; };
+  camera.userData.unfollowPlayer = () => { followPlayer = false; };
+  camera.userData.isFollowing = () => followPlayer;
+  camera.userData.updateShadowPosition = (lightSource) => {
+    if (lightSource && lightSource.position) {
+      camera.userData.shadowPosition = {
+        x: lightSource.position.x,
+        y: lightSource.position.y,
+        z: lightSource.position.z
+      };
+    }
+  };
+  camera.userData.getShadowPosition = () => camera.userData.shadowPosition;
 
   return camera;
 }
