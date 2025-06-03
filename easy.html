@@ -228,6 +228,11 @@
         <span class="start-text">START</span>
       </div>
     </div>
+    <!-- Adiciona o import do Three.js via CDN -->
+    <script type="module">
+      import * as THREE from "https://unpkg.com/three@0.150.1/build/three.module.js";
+      window.THREE = THREE;
+    </script>
     <script type="module" src="src/main_easy.js"></script>
     <script>
       window.addEventListener("load", () => {

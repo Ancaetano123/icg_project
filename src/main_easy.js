@@ -1,4 +1,4 @@
-import * as THREE from "three";
+const THREE = window.THREE;
 import { Renderer } from "./components/Renderer";
 import { Camera } from "./components/Camera";
 import { DirectionalLight } from "./components/DirectionalLight";
