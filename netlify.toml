@@ -1,4 +1,19 @@
 [build]
-  command = "npm install three"
-  command = "npm run build"
+  command = "npm install && npm run build"
   publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Adicionar header para módulos ES
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "/src/*"
+  [headers.values]
+    Content-Type = "application/javascript"

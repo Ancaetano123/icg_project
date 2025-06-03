@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { tileSize } from "../constants";
-import { Wheel } from "./Wheel";
 
 export function Truck(initialTileIndex, color, direction = true) {
   const truck = new THREE.Group();
@@ -16,8 +15,6 @@ export function Truck(initialTileIndex, color, direction = true) {
   cabin.castShadow = true;
   cabin.receiveShadow = true;
   truck.add(cabin);
-
-  
 
   // Carga do caminhão
   const cargo = new THREE.Mesh(
@@ -53,34 +50,33 @@ export function Truck(initialTileIndex, color, direction = true) {
   const mirrorGeometry = new THREE.CylinderGeometry(1, 1, 3, 8);
 
   const leftMirrorBase = new THREE.Mesh(mirrorBaseGeometry, mirrorMaterial);
-  leftMirrorBase.position.set(40, -18, 25);
+  leftMirrorBase.position.set(30, -18, 20);
   truck.add(leftMirrorBase);
 
   const leftMirror = new THREE.Mesh(mirrorGeometry, mirrorMaterial);
   leftMirror.rotation.z = Math.PI / 2;
-  leftMirror.position.set(40, -20, 25);
+  leftMirror.position.set(30, -20, 20);
   truck.add(leftMirror);
 
   const rightMirrorBase = new THREE.Mesh(mirrorBaseGeometry, mirrorMaterial);
-  rightMirrorBase.position.set(40, 18, 25);
+  rightMirrorBase.position.set(30, 18, 20);
   truck.add(rightMirrorBase);
 
   const rightMirror = new THREE.Mesh(mirrorGeometry, mirrorMaterial);
   rightMirror.rotation.z = Math.PI / 2;
-  rightMirror.position.set(40, 20, 25);
+  rightMirror.position.set(30, 20, 20);
   truck.add(rightMirror);
 
-  // Rodas
-  const frontWheel = Wheel(37);
-  truck.add(frontWheel);
+  // Adicionar rodas
+  import("./Wheel").then(({ Wheel }) => {
+    const frontWheel = Wheel(18);
+    truck.add(frontWheel);
 
-  const middleWheel = Wheel(5);
-  truck.add(middleWheel);
+    const backWheel = Wheel(-18);
+    truck.add(backWheel);
+  });
 
-  const backWheel = Wheel(-35);
-  truck.add(backWheel);
-  
-  // Inverte o camião se direção for para a esquerda
+  // Inverte o caminhão se direção for para a esquerda
   if (direction === false) {
     truck.scale.x = -1;
   }

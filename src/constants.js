@@ -1,4 +1,4 @@
-export const minTileIndex = -10;
-export const maxTileIndex = 10;
-export const tilesPerRow = maxTileIndex - minTileIndex + 1;
-export const tileSize = 65;
+export const tileSize = 50;
+export const tilesPerRow = 20;
+export const minTileIndex = -Math.floor(tilesPerRow / 2);
+export const maxTileIndex = Math.floor(tilesPerRow / 2);
