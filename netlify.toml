@@ -7,13 +7,12 @@
   to = "/index.html"
   status = 200
 
-# Adicionar header para módulos ES
 [[headers]]
   for = "*.js"
   [headers.values]
     Content-Type = "application/javascript"
 
 [[headers]]
-  for = "/src/*"
+  for = "/assets/*"
   [headers.values]
-    Content-Type = "application/javascript"
+    Cache-Control = "max-age=31536000"
