@@ -1,4 +1,13 @@
-@import url("https://fonts.googleapis.com/css?family=Press+Start+2P");
+body,
+.hud,
+#score-hud,
+#coin-score,
+#life-hud,
+#game-instructions,
+.instructions,
+.score {
+  font-family: "Press Start 2P", cursive;
+}
 
 body {
   margin: 0;
@@ -98,4 +107,35 @@ canvas.game {
     font-size: inherit;
     cursor: pointer;
   }
+}
+
+#start-overlay {
+  font-family: "Press Start 2P", cursive;
+  font-size: 1.2em;
+  z-index: 3000;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s;
+  text-align: center;
+  pointer-events: none;
+}
+
+#game-instructions {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  background: #000;
+  color: #fff;
+  font-family: "Press Start 2P", cursive;
+  font-size: 1.1em;
+  padding: 10px 0 8px 18px;
+  z-index: 2000;
+  text-align: left;
+  letter-spacing: 0.5px;
+  box-sizing: border-box;
+  line-height: 1.3;
+  opacity: 0.96;
+  border-top: 2px solid #fff;
+  pointer-events: none;
 }

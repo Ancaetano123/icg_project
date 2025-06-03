@@ -5,228 +5,35 @@
     <link rel="icon" type="image/svg+xml" href="road_rumble.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Road Rumble - Easy</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Press Start 2P", cursive;
-        background: #000;
-        color: #fff;
-        overflow: hidden;
-      }
-      #preloader {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #000;
-        z-index: 10;
-      }
-      #game-container {
-        display: none;
-      }
-      #result-container {
-        position: absolute;
-        min-width: 100%;
-        min-height: 100%;
-        top: 0;
-        left: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,0.85);
-        z-index: 100;
-        visibility: hidden;
-        transition: background 0.3s;
-        backdrop-filter: blur(2.5px);
-      }
-      #result {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: #111;
-        border-radius: 18px;
-        box-shadow: 0 8px 32px 0 #000, 0 0 0 8px #fff;
-        padding: 48px 36px 28px 36px;
-        border: 4px solid #fff;
-        color: #fff;
-        min-width: 340px;
-        min-height: 320px;
-        z-index: 1;
-      }
-      .pixel-title {
-        font-size: 2.5em;
-        margin: 30px 0 10px 0;
-        color: #e53935;
-        letter-spacing: 2px;
-        text-shadow:
-          0 0 0 #000,
-          4px 4px 0 #000,
-          0 0 6px #fff;
-        font-family: "Press Start 2P", cursive;
-        text-transform: uppercase;
-        z-index: 1;
-      }
-      .pixel-subtitle {
-        font-size: 1em;
-        margin: 0 0 18px 0;
-        color: #fff;
-        text-shadow: 2px 2px 0 #000, 0 0 6px #fff;
-        font-family: "Press Start 2P", cursive;
-        z-index: 1;
-      }
-      .final-score-label {
-        font-size: 1em;
-        margin: 30px 0 0 0;
-        color: #fff;
-        background: #000;
-        padding: 6px 18px;
-        border-radius: 8px;
-        text-shadow: 2px 2px 0 #000, 0 0 6px #fff;
-        font-family: "Press Start 2P", cursive;
-        z-index: 1;
-        text-align: center;
-        letter-spacing: 1px;
-        border: 2px solid #fff;
-      }
-      .final-score-value {
-        font-size: 2.2em;
-        font-weight: 900;
-        color: #fff;
-        background: #000;
-        padding: 10px 32px;
-        border-radius: 10px;
-        margin-bottom: 18px;
-        margin-top: 10px;
-        text-shadow:
-          2px 2px 0 #000,
-          0 0 8px #fff,
-          0 0 2px #000;
-        font-family: "Press Start 2P", cursive;
-        z-index: 1;
-        letter-spacing: 2px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        filter: none;
-        border: 2px solid #fff;
-      }
-      .pixel-btn-row {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-        margin-top: 10px;
-        align-items: center;
-        width: 100%;
-        z-index: 1;
-      }
-      .pixel-btn {
-        font-family: "Press Start 2P", cursive;
-        font-size: 1.2em;
-        font-weight: bold;
-        border: 0;
-        border-radius: 12px;
-        padding: 20px 60px;
-        cursor: pointer;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.32), 0 0 0 4px #fff inset;
-        image-rendering: pixelated;
-        outline: 2px solid #222;
-        outline-offset: -4px;
-        transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
-        margin: 0 auto;
-        display: block;
-        letter-spacing: 1px;
-        text-shadow: 2px 2px 0 #222;
-        width: 260px;
-        max-width: 90vw;
-      }
-      .pixel-green {
-        background: #fff;
-        color: #111;
-        border-bottom: 4px solid #e53935;
-      }
-      .pixel-green:hover {
-        background: #e53935;
-        color: #fff;
-        transform: scale(1.04) translateY(-1px);
-        box-shadow: 0 10px 32px 0 #e5393555, 0 0 0 4px #fff inset;
-      }
-      .pixel-red {
-        background: #e53935;
-        color: #fff;
-        border-bottom: 4px solid #fff;
-      }
-      .pixel-red:hover {
-        background: #fff;
-        color: #e53935;
-        transform: scale(1.04) translateY(-1px);
-        box-shadow: 0 10px 32px 0 #e5393555, 0 0 0 4px #fff inset;
-      }
-      #start-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: none;
-        z-index: 9999;
-        visibility: hidden;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.4s;
-      }
-      .start-text {
-        font-family: "Press Start 2P", cursive;
-        font-size: 7em;
-        color: #fff;
-        background: #000;
-        border: 6px solid #fff;
-        border-radius: 18px;
-        padding: 30px 60px;
-        text-shadow:
-          0 0 0 #000,
-          6px 6px 0 #000,
-          -6px -6px 0 #000,
-          0 0 24px #fff,
-          2px 2px 0 #000,
-          -2px -2px 0 #000;
-        letter-spacing: 8px;
-        image-rendering: pixelated;
-        text-align: center;
-        text-transform: uppercase;
-        opacity: 0.98;
-        box-sizing: border-box;
-      }
-    </style>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <div id="preloader">
       <h1>Loading...</h1>
     </div>
-    <div id="game-container">
+    <div id="game-container" style="position:relative; width:100vw; height:100vh;">
       <canvas class="game"></canvas>
       <div id="controls">
         <p>Use W, A, S, D to move and Space to jump over obstacles!</p>
       </div>
       <div id="score" style="display:none"></div>
-      <div id="result-container" style="display: none; visibility: hidden;">
-        <div id="result">
-          <h1 class="pixel-title" style="font-size:3.5em;margin-top:40px;margin-bottom:30px;">GAME OVER</h1>
-          <p class="final-score-label">Final Score:</p>
-          <div id="final-score" class="final-score-value"></div>
-          <div class="pixel-btn-row">
+      <div id="result-container" style="display: none; visibility: hidden; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #000; border: 4px solid #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(0,0,0,0.45); padding: 10px 24px 18px 24px; z-index: 1000; min-width: 160px; min-height: 0;">
+        <div id="result" style="display: flex; flex-direction: column; align-items: center;">
+          <h1 class="pixel-title" style="font-size:2em;margin-top:10px;margin-bottom:18px;color:#e53935;text-align:center;letter-spacing:2px;">GAME OVER</h1>
+          <p class="final-score-label" style="color:#fff;font-size:1em;text-align:center;">Final Score:</p>
+          <div id="final-score" class="final-score-value" style="color:#fff;font-size:1.2em;text-align:center;margin-bottom:12px;"></div>
+          <div class="pixel-btn-row" style="display:flex;gap:12px;justify-content:center;">
             <button id="retry" class="pixel-btn pixel-green" style="background:#43a047;color:#fff;border-bottom:4px solid #2e7031;">Play Again</button>
             <button id="back" class="pixel-btn pixel-red">Exit</button>
           </div>
+          <!-- Botão Revive, oculto por padrão -->
+          <button id="revive" class="pixel-btn pixel-pink" style="display:none;margin-top:18px;background:#ff4081;color:#fff;border-bottom:4px solid #c2185b;">Revive</button>
         </div>
       </div>
-      <div id="start-overlay">
-        <span class="start-text">START</span>
-      </div>
+
+      <!-- Overlay de início removido -->
+      <!-- Texto de instruções fixo no fundo removido -->
     </div>
     <!-- Adiciona o import do Three.js via CDN -->
     <script type="module">
@@ -241,7 +48,12 @@
       });
 
       document.getElementById("retry").addEventListener("click", () => {
-        location.reload();
+        // Mostra o preloader antes de recarregar
+        document.getElementById("preloader").style.display = "flex";
+        document.getElementById("game-container").style.display = "none";
+        setTimeout(() => {
+          location.reload();
+        }, 200); // Pequeno delay para garantir que o preloader aparece
       });
 
       document.getElementById("back").addEventListener("click", () => {
@@ -275,6 +87,9 @@
           result.style.visibility = "hidden";
         }
       };
+
+      // Exemplo de como mostrar o botão revive via JS:
+      // document.getElementById("revive").style.display = "block";
     </script>
   </body>
 </html>
