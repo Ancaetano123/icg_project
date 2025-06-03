@@ -1,4 +1,4 @@
-import * as THREE from "three";
+const THREE = window.THREE;
 import { minTileIndex, maxTileIndex } from "../constants";
 
 // --- Coin probability is now managed here as a module variable ---

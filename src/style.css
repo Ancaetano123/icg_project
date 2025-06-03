@@ -6,8 +6,8 @@ body {
   overflow: hidden;
   display: flex;
   font-family: "Press Start 2P", cursive;
-  background-color: #ffff; /* Alterado para um fundo escuro */
-  color: #ffffff; /* Alterado para texto azul claro */
+  background-color: #fffbe6; /* amarelo pastel claro */
+  color: #222;
 }
 
 canvas.game {
@@ -18,7 +18,7 @@ canvas.game {
   height: 100vh;
   z-index: 1;
   display: block !important;
-  background: #181a20;
+  background: #fffbe6; /* igual ao body */
 }
 
 /* Ensure UI elements are above the canvas */

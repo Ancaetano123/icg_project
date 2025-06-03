@@ -1,4 +1,4 @@
-import * as THREE from "three";
+const THREE = window.THREE;
 import { metadata as rows } from "./components/Map";
 import { player, position, isGameOver, setGameOver } from "./components/Player";
 import { powerUpEffects } from "./animatePlayer";

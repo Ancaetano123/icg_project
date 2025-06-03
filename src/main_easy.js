@@ -16,27 +16,19 @@ import { createPlayerPreviewModel } from "./components/Player";
 import { superpowers, activateSuperpower, getPurchaseCount, createSuperpowerButtons, updateSuperpowerCounters, useSuperpower, updateSuperpowerButtonStates, lifeSystem, getExtraLives, setExtraLives, useExtraLife, addExtraLife } from "./superpowers";
 
 const scene = new THREE.Scene();
-scene.add(player); // Adiciona o player (com sombra como filho)
+scene.add(player);
 scene.add(map);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.6); // cor branca, intensidade aumentada
+// Luz ambiente branca, equilibrada
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.74); // intensidade média
 scene.add(ambientLight);
 
+// Luz direcional branca, inclinada, com sombras
 const dirLight = DirectionalLight();
-dirLight.intensity = 1.2; // aumenta a intensidade da luz direcional
-dirLight.target = new THREE.Object3D(); // Define um alvo fixo para a luz
-scene.add(dirLight); // Adicione a luz ao scene diretamente
+scene.add(dirLight);
 
 const camera = Camera();
 scene.add(camera); // Sempre adiciona ao scene, nunca ao player
-
-// Atualize a posição inicial da sombra com base na luz direcional
-const shadowPosition = dirLight.position.clone(); // Posição fixa da luz
-function updateShadowPosition() {
-  if (player && player.fixedShadow) {
-    player.fixedShadow.position.set(shadowPosition.x, shadowPosition.y, shadowPosition.z);
-  }
-}
 
 const scoreDOM = document.getElementById("score");
 const resultDOM = document.getElementById("result-container");
@@ -320,7 +312,7 @@ let inCustomization = false; // Inicialize como false
 
 // Adicione a criação do renderer e o loop de animação principal
 const renderer = Renderer();
-renderer.setClearColor(0x181a20, 1); // Fundo escuro igual ao CSS
+renderer.setClearColor(0xffffff, 1); // fundo branco puro
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Better shadow quality
 
@@ -1555,8 +1547,7 @@ function animate() {
   coinCatch();
   hitTest();
 
-  // Atualize a posição da sombra para ser fixa
-  updateShadowPosition();
+  // Removido: updateShadowPosition(); // Não é mais necessário, sombra é fixa
 
   // Update magnet effects if active
   if (window.activeMagnetEffect) {

@@ -1,4 +1,5 @@
-import * as THREE from "three";
+const THREE = window.THREE;
+// import * as THREE from "three";
 import { tileSize } from "../constants";
 import { Wheel } from "./Wheel";
 
@@ -85,5 +86,7 @@ export function Truck(initialTileIndex, color, direction = true) {
     truck.scale.x = -1;
   }
 
+  truck.castShadow = true;
+  truck.receiveShadow = true;
   return truck;
 }

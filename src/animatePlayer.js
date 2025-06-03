@@ -1,4 +1,5 @@
-import * as THREE from "three";
+const THREE = window.THREE;
+// import * as THREE from "three";
 import {
   player,
   position,

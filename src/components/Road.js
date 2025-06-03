@@ -1,4 +1,4 @@
-import * as THREE from "three";
+const THREE = window.THREE;
 import { tilesPerRow, tileSize } from "../constants";
 
 export function Road(rowIndex) {

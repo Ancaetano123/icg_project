@@ -1,4 +1,5 @@
-import * as THREE from "three";
+const THREE = window.THREE;
+// import * as THREE from "three";
 import { tileSize } from "../constants";
 
 export function Coin(tileIndex) {
@@ -27,5 +28,7 @@ export function Coin(tileIndex) {
   // Marcar a moeda para detecção do ímã
   coin.userData.isCoin = true;
 
+  coin.castShadow = true;
+  coin.receiveShadow = true;
   return coin;
 }

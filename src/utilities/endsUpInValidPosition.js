@@ -1,7 +1,7 @@
 import { calculateFinalPosition } from "./calculateFinalPosition";
 import { minTileIndex, maxTileIndex, tileSize } from "../constants";
 import { metadata as rows } from "../components/Map";
-import * as THREE from "three";
+const THREE = window.THREE;
 
 export function endsUpInValidPosition(currentPosition, moves) {
   // Detecta se o último movimento é um salto

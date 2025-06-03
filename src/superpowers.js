@@ -1,4 +1,4 @@
-import * as THREE from "three";
+const THREE = window.THREE;
 
 // SALDO GLOBAL (usa localStorage para persistir)
 export function getTotalCoins() {

@@ -1,4 +1,4 @@
-import * as THREE from "three";
+const THREE = window.THREE;
 
 let followPlayer = false;
 
