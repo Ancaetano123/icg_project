@@ -32,7 +32,7 @@ Play online: [https://roadrumble.netlify.app/](https://roadrumble.netlify.app/)
    ```bash
    npm run dev
    ```
-   The game will be available at [http://localhost:5173/easy.html](http://localhost:5173/easy.html) (or the port indicated by Vite).
+   The game will be available at something like that [http://localhost:5173/easy.html](http://localhost:5173/easy.html) (or the port indicated by Vite).
 
 ## How to build for production
 
