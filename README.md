@@ -1,73 +1,73 @@
 # Road Rumble
 
-Road Rumble é um jogo 3D casual, desenvolvido em JavaScript com Three.js. O objetivo é atravessar estradas movimentadas, evitar obstáculos e apanhar moedas, desbloqueando skins e poderes especiais.
+Road Rumble is a casual 3D game developed in JavaScript with Three.js. The goal is to cross busy roads, avoid obstacles, and collect coins, unlocking skins and special powers.
 
-## Demonstração Online
+## Online Demo
 
-Jogo online : [https://roadrumble.netlify.app/](https://roadrumble.netlify.app/)
+Play online: [https://roadrumble.netlify.app/](https://roadrumble.netlify.app/)
 
-## Funcionalidades
+## Features
 
-- Gráficos 3D low-poly com Three.js
-- Personagem personalizável com várias skins
-- Power-ups: escudo, foguete, íman e vidas extra
-- Sistema de moedas e loja
-- Dificuldade progressiva
-- Suporte para desktop apenas
+- 3D low-poly graphics with Three.js
+- Customizable character with multiple skins
+- Power-ups: shield, rocket, magnet, and extra lives
+- Coin and shop system
+- Progressive difficulty
+- Desktop support only
 
-## Como jogar em modo de desenvolvimento
+## How to run in development mode
 
-1. **Clonar o repositório:**
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/Ancaetano123/icg_project
    cd icg_project
    ```
 
-2. **Instalar as dependências:**
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Iniciar o servidor de desenvolvimento:**
+3. **Start the development server:**
    ```bash
    npm run dev
    ```
-   O jogo ficará disponível em [http://localhost:5173/easy.html](http://localhost:5173/easy.html) (ou na porta indicada pelo Vite).
+   The game will be available at [http://localhost:5173/easy.html](http://localhost:5173/easy.html) (or the port indicated by Vite).
 
-## Como fazer build para produção
+## How to build for production
 
 ```bash
 npm run build
 ```
-Os ficheiros otimizados ficam na pasta `dist/`.
+The optimized files will be in the `dist/` folder.
 
-## Como publicar num site externo (exemplo Netlify)
+## How to deploy to an external site (example: Netlify)
 
-1. Acede a [https://app.netlify.com/](https://app.netlify.com/)
-2. Clica em "Add new site" > "Import an existing project"
-3. Liga o teu repositório GitHub e seleciona o projeto
-4. Define o comando de build: `npm run build`
-5. Define a pasta de publicação: `dist`
-6. Clica em "Deploy site"
+1. Go to [https://app.netlify.com/](https://app.netlify.com/)
+2. Click "Add new site" > "Import an existing project"
+3. Connect your GitHub repository and select the project
+4. Set the build command: `npm run build`
+5. Set the publish directory: `dist`
+6. Click "Deploy site"
 
-Ou faz deploy manual:
-- Faz build (`npm run build`)
-- Faz upload da pasta `dist/` para o Netlify, Vercel, GitHub Pages, etc.
+Or deploy manually:
+- Build (`npm run build`)
+- Upload the `dist/` folder to Netlify, Vercel, GitHub Pages, etc.
 
-## Tecnologias utilizadas
+## Technologies used
 
-- [Three.js](https://threejs.org/) — gráficos 3D
-- [Vite](https://vitejs.dev/) — bundler e servidor de desenvolvimento
-- [JavaScript](https://www.javascript.com/) - linguagem utilizada 
+- [Three.js](https://threejs.org/) — 3D graphics
+- [Vite](https://vitejs.dev/) — bundler and dev server
+- [JavaScript](https://www.javascript.com/) — main language
 
-## Créditos e Inspiração
+## Credits & Inspiration
 
-Desenvolvido por **António Caetano**.
+Developed by **António Caetano**.
 
-Alguns componentes e mecânicas do jogo foram inspirados e adaptados de [https://javascriptgametutorials.com/](https://javascriptgametutorials.com/).
+Some components and game mechanics were inspired and adapted from [https://javascriptgametutorials.com/](https://javascriptgametutorials.com/).
 
-Imagens, gráficos e código são de autoria própria.
+Images, graphics, and code are original.
 
 ---
 
-**Diverte-te a jogar Road Rumble!**
+**Have fun playing Road Rumble!**
