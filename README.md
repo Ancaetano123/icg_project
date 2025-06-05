@@ -1,6 +1,6 @@
 # Road Rumble
 
-Road Rumble é um jogo 3D casual inspirado em clássicos como Crossy Road, desenvolvido em JavaScript com Three.js. O objetivo é atravessar estradas movimentadas, evitar obstáculos e apanhar moedas, desbloqueando skins e poderes especiais.
+Road Rumble é um jogo 3D casual, desenvolvido em JavaScript com Three.js. O objetivo é atravessar estradas movimentadas, evitar obstáculos e apanhar moedas, desbloqueando skins e poderes especiais.
 
 ## Demonstração Online
 
@@ -58,7 +58,7 @@ Ou faz deploy manual:
 
 - [Three.js](https://threejs.org/) — gráficos 3D
 - [Vite](https://vitejs.dev/) — bundler e servidor de desenvolvimento
-- JavaScript
+- [JavaScript](https://www.javascript.com/) - linguagem utilizada 
 
 ## Créditos e Inspiração
 
@@ -66,7 +66,7 @@ Desenvolvido por **António Caetano**.
 
 Alguns componentes e mecânicas do jogo foram inspirados e adaptados de [https://javascriptgametutorials.com/](https://javascriptgametutorials.com/).
 
-Imagens,e código são de autoria própria.
+Imagens, gráficos e código são de autoria própria.
 
 ---
 
