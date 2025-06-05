@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/', // Caminho absoluto para funcionar em Netlify
+  base: '/', 
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

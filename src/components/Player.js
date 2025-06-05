@@ -1,25 +1,23 @@
 import * as THREE from "three";
 import { endsUpInValidPosition } from "../utilities/endsUpInValidPosition";
 import { metadata as rows, addRows } from "./Map";
-import { tileSize } from "../constants"; // Adicione este import se ainda não existir
-import { updateScoreHUD } from "../main_easy"; // ADICIONADO
+import { tileSize } from "../constants";
+import { updateScoreHUD } from "../main_easy";
 
 export const player = Player();
 export let isGameOver = false;
 export function setGameOver(val) { 
   isGameOver = val;
-  
-  // Reset shield effects when game over state changes
+  // Reset ao escudo ao mudar estado de game over
   if (!val && player.userData) {
-    // Keep shield if it was active (for revival)
-    // Don't reset shield state here
+    // Mantém escudo se estava ativo
   }
 }
 
 function Player() {
   const player = new THREE.Group();
 
-  // Sombra como filho do player (como estava antes)
+  // Sombra
   const shadow = new THREE.Mesh(
     new THREE.PlaneGeometry(32, 18),
     new THREE.MeshBasicMaterial({
@@ -35,7 +33,7 @@ function Player() {
   shadow.name = "fixedShadow";
   player.add(shadow);
 
-  // Cabeça (esfera)
+  // Cabeça
   const head = new THREE.Mesh(
     new THREE.SphereGeometry(5, 32, 32),
     new THREE.MeshLambertMaterial({
@@ -43,12 +41,12 @@ function Player() {
       flatShading: true,
     })
   );
-  head.position.set(0, 0, 27); // Increased from 25 for better spacing
+  head.position.set(0, 0, 27);
   head.rotation.x = 0;
   head.castShadow = true;
   head.receiveShadow = true;
 
-  // Corpo (esfera maior)
+  // Corpo
   const body = new THREE.Mesh(
     new THREE.SphereGeometry(7, 32, 32),
     new THREE.MeshLambertMaterial({
@@ -56,7 +54,7 @@ function Player() {
       flatShading: true,
     })
   );
-  body.position.set(0, 0, 16); // Increased from 15 for better spacing
+  body.position.set(0, 0, 16);
   body.castShadow = true;
   body.receiveShadow = true;
 
@@ -168,7 +166,7 @@ function Player() {
   rightLeg.castShadow = true;
   rightLeg.receiveShadow = true;
 
-  // Adiciona na ordem correta (sem sombra)
+  // Adiciona partes ao jogador
   player.add(head);
   player.add(body);
   player.add(leftArm);
@@ -176,7 +174,7 @@ function Player() {
   player.add(leftLeg);
   player.add(rightLeg);
 
-  // Referências diretas para animação
+  // Referências para animação
   player.head = head;
   player.body = body;
   player.leftArm = leftArm;
@@ -187,7 +185,7 @@ function Player() {
   return player;
 }
 
-// Skins disponíveis (pode expandir depois)
+// Skins disponíveis
 export const playerSkins = [
   {
     name: "Classic",
@@ -215,10 +213,8 @@ export const playerSkins = [
   },
 ];
 
-// Estado atual do skin
 let currentSkin = { ...playerSkins[0] };
 
-// Funções para guardar/obter índice da skin escolhida
 function getSelectedSkinIndex() {
   const idx = localStorage.getItem("selectedSkinIndex");
   return idx !== null ? parseInt(idx, 10) : 0;
@@ -227,7 +223,7 @@ function setSelectedSkinIndex(idx) {
   localStorage.setItem("selectedSkinIndex", String(idx));
 }
 
-// Função para aplicar skin ao modelo do jogador
+// Aplica skin ao jogador
 export function setPlayerSkin(skinOrIndex) {
   let idx = -1;
   let skin;
@@ -243,7 +239,7 @@ export function setPlayerSkin(skinOrIndex) {
   currentSkin = { ...skin };
   setSelectedSkinIndex(idx);
 
-  // player.children[0] = shadow, [1] = head, [2] = body, [3] = leftArm, [4] = rightArm, [5] = leftLeg, [6] = rightLeg
+
 
   // Cabeça
   player.children[1].material.color.set(currentSkin.skin);
@@ -274,7 +270,7 @@ export function setPlayerSkin(skinOrIndex) {
 }
 
 export const position = {
-  currentRow: -1, // Começa na linha imediatamente anterior à linha de partida
+  currentRow: -1, // Linha anterior à de partida
   currentTile: 0,
 };
 
@@ -282,20 +278,18 @@ export const movesQueue = [];
 
 export function initializePlayer() {
   player.position.x = 0;
-  player.position.y = -1 * tileSize; // Linha imediatamente anterior à linha de partida
+  player.position.y = -1 * tileSize;
 
-  // Initialize metadata
-  position.currentRow = -1; // Linha inicial é a anterior à linha de partida
-  position.currentTile = 0; // Centro do mapa original
+  position.currentRow = -1;
+  position.currentTile = 0;
 
-  // Clear the moves queue
   movesQueue.length = 0;
   isGameOver = false;
-  // Ao inicializar, aplica sempre a skin guardada
+  // Aplica skin guardada
   const idx = getSelectedSkinIndex();
   setPlayerSkin(idx);
   
-  // Initialize shield state
+  // Estado do escudo
   player.userData = { 
     hasShield: false, 
     shieldActive: false,
@@ -306,7 +300,7 @@ export function initializePlayer() {
 
 export function queueMove(direction) {
   if (isGameOver) return;
-  // Bloqueia qualquer movimento na linha de partida enquanto overlay está ativo
+  // Bloqueia movimento na linha de partida 
   if (
     typeof window.isStartOverlayActive === "function" &&
     window.isStartOverlayActive() &&
@@ -330,8 +324,8 @@ export function queueMove(direction) {
 
 export function queueJump() {
   if (isGameOver) return;
-  if (position.currentRow < 0) return; // já bloqueia salto no verde
-  // Verifica se o salto é válido (duas casas para frente)
+  if (position.currentRow < 0) return;
+  // Verifica se salto é válido
   const isValidJump = endsUpInValidPosition(
     {
       rowIndex: position.currentRow,
@@ -352,16 +346,15 @@ export function stepCompleted() {
   if (direction === "backward") position.currentRow -= 1;
   if (direction === "left") position.currentTile -= 1;
   if (direction === "right") position.currentTile += 1;
-  if (direction === "jump") position.currentRow += 2; // Salto para frente
+  if (direction === "jump") position.currentRow += 2;
 
-  // Adiciona novas linhas se o jogador estiver perto do final
+  // Adiciona linhas se perto do fim
   if (position.currentRow > rows.length - 10) addRows();
 
-  // Atualiza o HUD da pontuação principal (que agora também verifica bônus)
+  // Atualiza HUD da pontuação
   if (typeof updateScoreHUD === "function") {
     updateScoreHUD(position.currentRow >= 0 ? position.currentRow : 0);
   }
-
 }
 
 export function createPlayerPreviewModel(skin) {

@@ -1,4 +1,5 @@
 export function calculateFinalPosition(currentPosition, moves) {
+    // Calcula a posição final após os movimentos
     return moves.reduce((position, direction) => {
       if (direction === "forward")
         return {
@@ -22,4 +23,4 @@ export function calculateFinalPosition(currentPosition, moves) {
         };
       return position;
     }, currentPosition);
-  }
+}

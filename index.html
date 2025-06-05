@@ -26,12 +26,12 @@
         height: 100%;
         background: url('./road_rumble_background.png') no-repeat center center;
         background-size: cover;
-        filter: blur(5px); /* Blur effect aplicado ao fundo */
+        filter: blur(5px); 
         z-index: 0;
       }
       #content {
         position: relative;
-        z-index: 1; /* Certifique-se de que o conteúdo está acima do fundo */
+        z-index: 1; 
         text-align: center;
       }
       img.logo {
@@ -67,14 +67,14 @@
       <button class="start-button" id="start-button">Start</button>
     </div>
     <script>
-      // Reset progress when entering the main page
+      // Reset 
       localStorage.setItem("totalCoins", "0");
       localStorage.setItem("extraLives", "0");
       localStorage.setItem("superpowerPurchases", JSON.stringify({ shield: 0, rocket: 0, magnet: 0 }));
       localStorage.setItem("superpowerUses", JSON.stringify({ shield: 0, rocket: 0, magnet: 0 }));
       localStorage.setItem("unlockedSkins", JSON.stringify([true, false, false, false]));
       localStorage.setItem("selectedSkinIndex", "0");
-      // ...adapte se adicionar mais superpoderes ou skins...
+      
 
       document.getElementById("start-button").addEventListener("click", () => {
         window.location.href = "/easy.html";

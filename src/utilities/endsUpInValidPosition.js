@@ -1,17 +1,13 @@
 import { calculateFinalPosition } from "./calculateFinalPosition";
-import { minTileIndex, maxTileIndex, tileSize } from "../constants";
+import { minTileIndex, maxTileIndex } from "../constants";
 import { metadata as rows } from "../components/Map";
-import * as THREE from "three";
 
 export function endsUpInValidPosition(currentPosition, moves) {
-  // Detecta se o último movimento é um salto
+  // Verifica se o último movimento é salto
   const isJump = moves[moves.length - 1] === "jump";
 
-  // Para salto, precisamos checar a linha intermediária e a final
   if (isJump) {
-    // Posição inicial
     let { rowIndex, tileIndex } = currentPosition;
-    // Considera movimentos anteriores ao salto
     for (let i = 0; i < moves.length - 1; i++) {
       const dir = moves[i];
       if (dir === "forward") rowIndex += 1;
@@ -19,12 +15,10 @@ export function endsUpInValidPosition(currentPosition, moves) {
       if (dir === "left") tileIndex -= 1;
       if (dir === "right") tileIndex += 1;
     }
-    // Linha intermediária (primeiro passo do salto)
     const midRow = rowIndex + 1;
-    // Linha final (segundo passo do salto)
     const finalRow = rowIndex + 2;
 
-    // Fora dos limites do tabuleiro
+    // Fora dos limites
     if (
       tileIndex < minTileIndex ||
       tileIndex > maxTileIndex ||
@@ -34,7 +28,7 @@ export function endsUpInValidPosition(currentPosition, moves) {
       return false;
     }
 
-    // Checa obstáculos na linha intermediária
+    // Obstáculo na linha intermédia
     const midRowData = rows[midRow - 1];
     if (
       midRowData &&
@@ -43,15 +37,14 @@ export function endsUpInValidPosition(currentPosition, moves) {
         (plant) =>
           (plant.type === "tree" ||
             plant.type === "bush" ||
-            plant.type === "flower" ||
-            plant.type === "star") &&
+            plant.type === "flower") &&
           plant.tileIndex === tileIndex
       )
     ) {
       return false;
     }
 
-    // Checa obstáculos na linha final
+    // Obstáculo na linha final
     const finalRowData = rows[finalRow - 1];
     if (
       finalRowData &&
@@ -60,15 +53,14 @@ export function endsUpInValidPosition(currentPosition, moves) {
         (plant) =>
           (plant.type === "tree" ||
             plant.type === "bush" ||
-            plant.type === "flower" ||
-            plant.type === "star") &&
+            plant.type === "flower") &&
           plant.tileIndex === tileIndex
       )
     ) {
       return false;
     }
 
-    // Checa limites das linhas verdes antes da partida
+    // Limite das linhas verdes antes da partida
     const greenLines = 10;
     if (midRow < 0 && (midRow < -greenLines || midRow > -1)) return false;
     if (finalRow < 0 && (finalRow < -greenLines || finalRow > -1)) return false;
@@ -76,31 +68,30 @@ export function endsUpInValidPosition(currentPosition, moves) {
     return true;
   }
 
-  // Calculate where the player would end up after the move
+  // Calcula posição final
   const finalPosition = calculateFinalPosition(
     currentPosition,
     moves
   );
 
-  // Detect if we hit the edge of the board
+  // Bateu no limite do tabuleiro
   if (
     finalPosition.tileIndex < minTileIndex ||
     finalPosition.tileIndex > maxTileIndex
   ) {
-    // Invalid move, ignore move command
     return false;
   }
 
-  // Antes da linha de partida, impede ultrapassar as linhas verdes claras
+  // Antes da linha de partida, impede ultrapassar linhas verdes claras
   if (finalPosition.rowIndex < 0) {
-    const greenLines = 10; // igual ao valor em Map.js
+    const greenLines = 10;
     if (finalPosition.rowIndex < -greenLines || finalPosition.rowIndex > -1) {
       return false;
     }
     return true;
   }
 
-  // Detect if we hit a tree
+  // Obstáculo na linha final
   const finalRow = rows[finalPosition.rowIndex - 1];
   if (
     finalRow &&
@@ -109,12 +100,10 @@ export function endsUpInValidPosition(currentPosition, moves) {
       (plant) =>
         (plant.type === "tree" ||
          plant.type === "bush" ||
-         plant.type === "flower" ||
-         plant.type === "star") && // Inclui star
+         plant.type === "flower") &&
         plant.tileIndex === finalPosition.tileIndex
     )
   ) {
-    // Invalid move, ignore move command
     return false;
   }
 

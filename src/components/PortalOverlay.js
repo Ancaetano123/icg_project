@@ -9,7 +9,7 @@ export default function PortalOverlay({ visible, duration = 2000, onFinish }) {
     function animate(ts) {
       if (!start) start = ts;
       const elapsed = ts - start;
-      // Efeito de opacidade pulsante e distorção
+      // Animação de opacidade 
       const progress = Math.min(elapsed / duration, 1);
       const opacity = 0.45 + 0.35 * Math.sin(progress * Math.PI * 2);
       if (overlayRef.current) {
@@ -26,6 +26,7 @@ export default function PortalOverlay({ visible, duration = 2000, onFinish }) {
     requestAnimationFrame(animate);
   }, [visible, duration, onFinish]);
 
+  // Overlay visual
   return (
     <div
       ref={overlayRef}

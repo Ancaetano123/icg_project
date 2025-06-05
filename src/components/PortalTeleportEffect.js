@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 export default function PortalTeleportEffect({ visible, duration = 1000, onFinish }) {
+  // Estado do efeito
   const [show, setShow] = useState(false);
   const [opacity, setOpacity] = useState(0);
   const animRef = useRef();
@@ -14,7 +15,7 @@ export default function PortalTeleportEffect({ visible, duration = 1000, onFinis
         if (!start) start = ts;
         const elapsed = ts - start;
         let progress = Math.min(elapsed / duration, 1);
-        // Fade in (primeiros 20%), depois fade out (últimos 20%)
+        // Fade in e fade out
         let op;
         if (progress < 0.2) {
           op = progress / 0.2;
@@ -42,6 +43,7 @@ export default function PortalTeleportEffect({ visible, duration = 1000, onFinis
 
   if (!show) return null;
 
+  // Overlay visual
   return (
     <div
       style={{

@@ -9,7 +9,7 @@ import { tilesPerRow, tileSize } from "../constants";
 import { Coin } from "./Coin";
 import { Portal } from "./Portal";
 
-// Linha de partida xadrez preto e branco
+// Linha de partida xadrez
 function StartLine(rowIndex) {
   const group = new THREE.Group();
   group.position.y = rowIndex * tileSize;
@@ -29,14 +29,14 @@ function StartLine(rowIndex) {
   return group;
 }
 
-// Linha de relva verde claro (não xadrez)
+// Linha de relva verde claro
 function GrassLightGreen(rowIndex) {
   const group = new THREE.Group();
   group.position.y = rowIndex * tileSize;
 
   const tile = new THREE.Mesh(
     new THREE.BoxGeometry(tilesPerRow * tileSize, tileSize, 3),
-    new THREE.MeshLambertMaterial({ color: "#b2e07a" }) // verde claro
+    new THREE.MeshLambertMaterial({ color: "#b2e07a" })
   );
   tile.position.z = 1.5;
   tile.receiveShadow = true;
@@ -45,14 +45,14 @@ function GrassLightGreen(rowIndex) {
   return group;
 }
 
-// Linha de solo bege para floresta
+// Linha de solo bege
 function BeigeSoil(rowIndex) {
   const group = new THREE.Group();
   group.position.y = rowIndex * tileSize;
 
   const tile = new THREE.Mesh(
     new THREE.BoxGeometry(tilesPerRow * tileSize, tileSize, 3),
-    new THREE.MeshLambertMaterial({ color: "#FAEBD7" }) // bege
+    new THREE.MeshLambertMaterial({ color: "#FAEBD7" })
   );
   tile.position.z = 1.5;
   tile.receiveShadow = true;
@@ -66,22 +66,20 @@ export const metadata = [];
 export const map = new THREE.Group();
 
 export function initializeMap() {
-  // Remove all rows
   metadata.length = 0;
   map.remove(...map.children);
 
-  // Número de linhas verde claro antes da linha de partida
+  // Linhas verdes antes da partida
   const greenLines = 10;
   for (let i = -greenLines; i <= -1; i++) {
     const grass = GrassLightGreen(i);
     map.add(grass);
   }
 
-  // Linha de partida xadrez preto e branco (rowIndex 0)
+  // Linha de partida xadrez (rowIndex 0)
   const startLine = StartLine(0);
   map.add(startLine);
 
-  // NÃO adicionar mais linhas de relva! As próximas linhas são geradas dinamicamente.
   addRows();
 }
 
@@ -92,33 +90,39 @@ export function addRows() {
   metadata.push(...newMetadata);
 
   newMetadata.forEach((rowData, index) => {
-    const rowIndex = startIndex + index + 1; // +1 porque 0 é a linha de partida
+    const rowIndex = startIndex + index + 1;
 
     if (rowData.type === "forest") {
       const row = BeigeSoil(rowIndex);
 
-      rowData.plants.forEach(({ tileIndex, type, height }) => {
-        let plant;
-        if (type === "tree") {
-          plant = Tree(tileIndex, height);
-        } else if (type === "bush") {
-          plant = Bush(tileIndex);
-        } else if (type === "flower") {
-          plant = Flower(tileIndex);
-        } else if (type === "star") {
-          plant = Flower(tileIndex);
-        }
-        row.add(plant);
-      });
+      rowData.plants
+        .filter(plant =>
+          plant.type === "tree" ||
+          plant.type === "bush" ||
+          plant.type === "flower"
+        )
+        .forEach((plant) => {
+          let plantObj = null;
+          if (plant.type === "tree") {
+            plantObj = Tree(plant.tileIndex, plant.height);
+          } else if (plant.type === "bush") {
+            plantObj = Bush(plant.tileIndex);
+          } else if (plant.type === "flower") {
+            plantObj = Flower(plant.tileIndex);
+          }
+          if (plantObj) {
+            row.add(plantObj);
+          }
+        });
 
-      // --- Adiciona moeda se existir ---
+      // Moeda
       if (rowData.coin) {
         const coin = Coin(rowData.coin.tileIndex);
         row.add(coin);
         rowData.coin.ref = coin;
       }
 
-      // --- Adiciona portal se existir ---
+      // Portal
       if (rowData.portal) {
         const portal = Portal(rowData.portal.tileIndex, rowData.portal.direction);
         row.add(portal);
@@ -141,14 +145,14 @@ export function addRows() {
         row.add(vehicleObj);
       });
 
-      // --- Adiciona moeda se existir ---
+      // Moeda
       if (rowData.coin) {
         const coin = Coin(rowData.coin.tileIndex);
         row.add(coin);
         rowData.coin.ref = coin;
       }
 
-      // --- Adiciona portal se existir ---
+      // Portal
       if (rowData.portal) {
         const portal = Portal(rowData.portal.tileIndex, rowData.portal.direction);
         row.add(portal);

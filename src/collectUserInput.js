@@ -18,12 +18,12 @@ document
   ?.addEventListener("click", () => queueMove("right"));
 
 window.addEventListener("keydown", (event) => {
-  // Bloqueia qualquer input enquanto o overlay está ativo
+  // Bloqueia input se overlay ativo
   if (window.isStartOverlayActive && window.isStartOverlayActive()) return;
   // Bloqueia input durante teletransporte
   if (window.isTeleporting && window.isTeleporting()) return;
 
-  // No verde (linha -1) ou na linha de partida (linha 0), só permite novo input se movesQueue estiver vazio
+  // No verde ou partida, só permite input se movesQueue vazio
   if (
     (position.currentRow === -1 || position.currentRow === 0) &&
     movesQueue.length > 0
@@ -31,7 +31,7 @@ window.addEventListener("keydown", (event) => {
     return;
   }
 
-  // Movimento livre no verde (linha -1) e no resto do jogo
+  // Movimento livre
   if (event.key === "w" || event.key === "W") {
     event.preventDefault();
     queueMove("forward");
@@ -46,14 +46,14 @@ window.addEventListener("keydown", (event) => {
     queueMove("right");
   } else if (event.key === " ") {
     event.preventDefault();
-    queueJump(); // Chama a função de salto (já bloqueado no verde pelo Player.js)
+    queueJump();
   }
 });
 
-// Exponha movesQueue globalmente para o bloqueio funcionar
+// Expor movesQueue globalmente
 window.movesQueue = movesQueue;
 
-// NOVO: expose teleporting state
+// Expor estado de teletransporte
 let teleportingFlag = false;
 window.isTeleporting = (val) => {
   if (typeof val === "boolean") teleportingFlag = val;

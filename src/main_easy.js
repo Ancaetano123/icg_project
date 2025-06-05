@@ -16,75 +16,74 @@ import { createPlayerPreviewModel } from "./components/Player";
 import { superpowers, activateSuperpower, getPurchaseCount, createSuperpowerButtons, updateSuperpowerCounters, useSuperpower, updateSuperpowerButtonStates, lifeSystem, getExtraLives, setExtraLives, useExtraLife, addExtraLife } from "./superpowers";
 
 const scene = new THREE.Scene();
-scene.add(player); // Adiciona o player (com sombra como filho)
+scene.add(player); // Adiciona o player 
 scene.add(map);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.6); // cor branca, intensidade aumentada
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.6);
 scene.add(ambientLight);
 
 const dirLight = DirectionalLight();
-dirLight.intensity = 1.2; // aumenta a intensidade da luz direcional
-dirLight.target = new THREE.Object3D(); // Define um alvo fixo para a luz
-scene.add(dirLight); // Adicione a luz ao scene diretamente
+dirLight.intensity = 1.2;
+dirLight.target = new THREE.Object3D();
+scene.add(dirLight);
 
 const camera = Camera();
-scene.add(camera); // Sempre adiciona ao scene, nunca ao player
+scene.add(camera);
 
-// Atualize a posição inicial da sombra com base na luz direcional
-const shadowPosition = dirLight.position.clone(); // Posição fixa da luz
+// Posição da sombra fixa
+const shadowPosition = dirLight.position.clone();
 function updateShadowPosition() {
   if (player && player.fixedShadow) {
     player.fixedShadow.position.set(shadowPosition.x, shadowPosition.y, shadowPosition.z);
   }
 }
 
-const scoreDOM = document.getElementById("score");
 const resultDOM = document.getElementById("result-container");
 
-// Preços das skins (primeira é grátis)
-const skinPrices = [0, 30, 50, 80];
+// Preços das skins 
+const skinPrices = [0, 15, 25, 35];
 
-// Preços e lista de power-ups (valores mais realistas)
+// Power-up lista e preços
 const powerUps = [
   { 
-    name: superpowers[0]?.name || "Speed Boost",
-    description: superpowers[0]?.description || "Increases movement speed",
-    icon: superpowers[0]?.icon || "⚡",
-    effect: superpowers[0]?.effect || "speedBoost",
-    key: superpowers[0]?.key || 'speedBoost',
+    name: superpowers[0]?.name || "Shield",
+    description: superpowers[0]?.description || "Shield for 8s",
+    icon: superpowers[0]?.icon || "🛡️",
+    effect: superpowers[0]?.effect || "protection",
+    key: superpowers[0]?.key || "shield",
+    price: 10
+  },
+  { 
+    name: superpowers[1]?.name || "Rocket",
+    description: superpowers[1]?.description || "Advance 10 tiles",
+    icon: superpowers[1]?.icon || "🚀",
+    effect: superpowers[1]?.effect || "boostStart",
+    key: superpowers[1]?.key || "rocket",
+    price: 5
+  },
+  { 
+    name: superpowers[2]?.name || "Magnet",
+    description: superpowers[2]?.description || "Attracts coins for 10s",
+    icon: superpowers[2]?.icon || "🧲",
+    effect: superpowers[2]?.effect || "coinMagnet",
+    key: superpowers[2]?.key || "magnet",
     price: 15
   },
   { 
-    name: superpowers[1]?.name || "Jump",
-    description: superpowers[1]?.description || "Allows jumping over obstacles",
-    icon: superpowers[1]?.icon || "🦘",
-    effect: superpowers[1]?.effect || "jump",
-    key: superpowers[1]?.key || 'jump',
-    price: 20
-  },
-  { 
-    name: superpowers[2]?.name || "Shield",
-    description: superpowers[2]?.description || "Protects from damage",
-    icon: superpowers[2]?.icon || "🛡️",
-    effect: superpowers[2]?.effect || "shield",
-    key: superpowers[2]?.key || 'shield',
-    price: 25
-  },
-  { 
     name: "Extra Life",
-    description: "Adds one extra life for revival",
+    description: "Gain an extra life",
     icon: "❤️",
     effect: "extraLife",
-    key: 'extraLife',
-    price: 30
+    key: "extraLife",
+    price: 20
   }
 ];
 
-// Controle de moedas (localStorage para total, sessão para partida atual)
-window.currentSessionCoins = 0;     // Moedas ganhas na partida atual
-window.bonusGiven = { 100: false, 200: false }; // Para controlar os bónus
+// Controlo de moedas 
+window.currentSessionCoins = 0;
+window.bonusGiven = { 100: false, 200: false };
 
-// Funções para gerenciar saldo total (localStorage)
+// Saldo total de moedas
 function getTotalCoins() {
   return parseInt(localStorage.getItem("totalCoins") || "0", 10);
 }
@@ -92,7 +91,7 @@ function setTotalCoins(val) {
   localStorage.setItem("totalCoins", String(Math.max(0, val)));
 }
 
-// Carrega skins desbloqueadas (localStorage para unlocked, e para skin escolhida)
+// Skins desbloqueadas
 function getUnlockedSkins() {
   const saved = localStorage.getItem("unlockedSkins");
   return saved ? JSON.parse(saved) : [true, false, false, false];
@@ -101,7 +100,7 @@ function setUnlockedSkins(arr) {
   localStorage.setItem("unlockedSkins", JSON.stringify(arr));
 }
 
-// NOVO: Guardar e obter skin escolhida
+// Selecionar skin atual
 function getSelectedSkinIndex() {
   const idx = localStorage.getItem("selectedSkinIndex");
   return idx !== null ? parseInt(idx, 10) : 0;
@@ -110,46 +109,33 @@ function setSelectedSkinIndex(idx) {
   localStorage.setItem("selectedSkinIndex", String(idx));
 }
 
-// Função getCoinScore agora retorna total + partida atual
-function getCoinScore() {
-  return getTotalCoins() + window.currentSessionCoins;
-}
 
-// Função para iniciar nova partida (reseta moedas da partida)
+// Iniciar novo jogo (reset moedas da sessão)
 function startGame() {
-  // Reinicia o contador de moedas da partida
   window.currentSessionCoins = 0;
   window.bonusGiven = { 100: false, 200: false };
-  
-  // Atualiza HUD das moedas
   updateCoinHUD();
 }
 
-// Função para terminar o jogo (soma moedas da partida ao total guardado)
+// Terminar jogo (adiciona moedas da sessão ao total)
 function endGame() {
-  // Soma as moedas ganhas nesta partida ao saldo total guardado
   if (window.currentSessionCoins > 0) {
     const newTotal = getTotalCoins() + window.currentSessionCoins;
     setTotalCoins(newTotal);
-    
-    // Opcional: mostrar popup de moedas ganhas
+    // Coins earned popup (console)
     console.log(`You earned ${window.currentSessionCoins} coins! Total balance: ${newTotal}`);
   }
-  
-  // Reinicia o contador da partida para próxima vez
   window.currentSessionCoins = 0;
-  
-  // Atualiza HUD se necessário
   updateCoinHUD();
 }
 
-// Função para coletar moeda durante o jogo
+// Apanhar moeda durante o jogo
 function collectCoin() {
   window.currentSessionCoins += 1;
   updateCoinHUD();
 }
 
-// Função para verificar bônus por score
+// Verificar bónus de score
 function checkScoreBonus(score) {
   if (score >= 100 && !window.bonusGiven[100]) {
     window.currentSessionCoins += 10;
@@ -165,7 +151,7 @@ function checkScoreBonus(score) {
   }
 }
 
-// HUD das moedas (mostra saldo total e moedas da partida)
+// HUD moedas (mostra total e sessão)
 function updateCoinHUD() {
   let coinDOM = document.getElementById("coin-score");
   if (!coinDOM) {
@@ -182,13 +168,12 @@ function updateCoinHUD() {
     coinDOM.style.lineHeight = "1.4";
     document.body.appendChild(coinDOM);
   }
-  // Show total coins and session coins separately
   const totalCoins = getTotalCoins();
   const sessionCoins = window.currentSessionCoins;
   coinDOM.innerHTML = `🪙: ${totalCoins}<br> S: +${sessionCoins}`;
 }
 
-// Function to update life HUD
+// HUD vidas
 function updateLifeHUD() {
   let lifeDOM = document.getElementById("life-hud");
   if (!lifeDOM) {
@@ -208,22 +193,17 @@ function updateLifeHUD() {
   lifeDOM.innerText = `❤️: ${lives}`;
 }
 
-// Função para comprar power-up (usa saldo total primeiro, depois da partida)
+// Comprar power-up (usa moedas totais e sessão)
 function buyPowerUp(idx) {
   const pu = powerUps[idx];
   const price = pu.price || 0;
-  
-  // Check if player has enough coins
   let availableTotal = getTotalCoins();
   let availableSession = window.currentSessionCoins;
   const totalAvailable = availableTotal + availableSession;
-  
   if (totalAvailable < price) {
     console.log(`Insufficient coins! Need ${price} coins, you have ${totalAvailable}.`);
     return false;
   }
-  
-  // Deduct coins (first from total, then from session)
   let remaining = price;
   if (availableTotal >= remaining) {
     setTotalCoins(availableTotal - remaining);
@@ -232,54 +212,40 @@ function buyPowerUp(idx) {
     remaining -= availableTotal;
     window.currentSessionCoins = Math.max(0, availableSession - remaining);
   }
-  
-  // Update coin HUD after purchase
   updateCoinHUD();
-  
-  // Handle extra life purchase differently
   if (pu.effect === "extraLife") {
     addExtraLife();
     updateLifeHUD();
     console.log(`Purchased ${pu.name} for ${price} coins! Lives: ${getExtraLives()}`);
   } else {
-    // Use activateSuperpower which increments counter and shows confirmation
     activateSuperpower(pu.effect, { 
       player, 
       scene, 
       onComplete: () => {
         console.log(`${pu.name} effect completed!`);
-        // Update the bottom button counters after purchase
         updateSuperpowerCounters();
       }
     });
     console.log(`Purchased ${pu.name} for ${price} coins!`);
   }
-  
   return true;
 }
 
-// Função para comprar skin (usa saldo total primeiro, depois da partida)
+// Comprar skin (usa moedas totais e sessão)
 function tryBuySkin(skinIndex) {
   const price = skinPrices[skinIndex];
   const unlocked = getUnlockedSkins();
-  
-  // Verifica se já está desbloqueada
   if (unlocked[skinIndex]) {
-    console.log("Skin já desbloqueada!");
+    console.log("Skin already unlocked!");
     return false;
   }
-  
-  // Verifica se tem moedas suficientes
   let availableTotal = getTotalCoins();
   let availableSession = window.currentSessionCoins;
   const totalAvailable = availableTotal + availableSession;
-  
   if (totalAvailable < price) {
-    console.log(`Moedas insuficientes! Precisa de ${price} moedas, tens ${totalAvailable}.`);
+    console.log(`Not enough coins! Need ${price}, you have ${totalAvailable}.`);
     return false;
   }
-  
-  // Deduz moedas (primeiro do total, depois da sessão)
   let remaining = price;
   if (availableTotal >= remaining) {
     setTotalCoins(availableTotal - remaining);
@@ -288,20 +254,13 @@ function tryBuySkin(skinIndex) {
     remaining -= availableTotal;
     window.currentSessionCoins = Math.max(0, availableSession - remaining);
   }
-  
-  // Desbloqueia a skin
   const newUnlocked = getUnlockedSkins();
   newUnlocked[skinIndex] = true;
   setUnlockedSkins(newUnlocked);
-
-  // Aplica a skin comprada
   setPlayerSkin(skinIndex);
-  setSelectedSkinIndex(skinIndex); // <-- guardar como selecionada
-
-  // Atualiza UI
+  setSelectedSkinIndex(skinIndex);
   updateCoinHUD();
-  
-  console.log(`Skin "${playerSkins[skinIndex].name}" comprada por ${price} moedas!`);
+  console.log(`Skin "${playerSkins[skinIndex].name}" purchased for ${price} coins!`);
   return true;
 }
 
@@ -314,21 +273,20 @@ window.buyPowerUp = buyPowerUp;
 window.tryBuySkin = tryBuySkin;
 
 let thirdPerson = false;
-let startActive = false; // Controle do overlay de início
-let lastRow = -2; // Garante que a primeira transição funcione
-let inCustomization = false; // Inicialize como false
+let startActive = false;
+let lastRow = -2;
+let inCustomization = false;
 
-// Adicione a criação do renderer e o loop de animação principal
+// Renderer e ciclo principal
 const renderer = Renderer();
-renderer.setClearColor(0x181a20, 1); // Fundo escuro igual ao CSS
+renderer.setClearColor(0x181a20, 1);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Better shadow quality
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-// Attach renderer to DOM properly
 document.body.appendChild(renderer.domElement);
 renderer.domElement.className = "game";
 
-// Set initial canvas size
+// Ajustar tamanho do canvas
 function resizeRenderer() {
   const width = window.innerWidth;
   const height = window.innerHeight;
@@ -337,11 +295,9 @@ function resizeRenderer() {
   camera.updateProjectionMatrix();
 }
 
-// Initialize canvas size
 resizeRenderer();
 window.addEventListener('resize', resizeRenderer);
 
-// Separate animation loop function
 function startAnimationLoop() {
   function mainLoop() {
     animate();
@@ -356,29 +312,17 @@ function initializeGame() {
   initializePlayer();
   initializeMap();
   setupSidebarButtons();
-
-  // Initialize UI
   setupScoreHUD();
   setupCoinHUD();
-  updateLifeHUD(); // Initialize life HUD
-  
-  // Initialize superpower buttons (centered at bottom) - start disabled since player starts in green zone
+  updateLifeHUD();
   createSuperpowerButtons({ player, scene });
-  updateSuperpowerButtonStates(true); // Start disabled
-  
-  // Esconde completamente o result-container ao iniciar
+  updateSuperpowerButtonStates(true);
   if (resultDOM) {
     resultDOM.style.display = "none";
     resultDOM.style.visibility = "hidden";
   }
-  
-  // Ensure canvas is visible and properly sized
   resizeRenderer();
-  
-  // Inicia nova partida
   startGame();
-  
-  // Aplica a skin guardada ao iniciar o jogo
   const idx = getSelectedSkinIndex();
   const unlocked = getUnlockedSkins();
   if (unlocked[idx]) {
@@ -387,12 +331,10 @@ function initializeGame() {
     setPlayerSkin(playerSkins[0]);
     setSelectedSkinIndex(0);
   }
-
-  // Start the animation loop
   startAnimationLoop();
 }
 
-// NOVA FUNÇÃO: HUD da pontuação principal
+// Score HUD
 function setupScoreHUD() {
   let scoreDOM = document.getElementById("score-hud");
   if (!scoreDOM) {
@@ -411,7 +353,7 @@ function setupScoreHUD() {
   scoreDOM.innerText = `🏁: 0`;
 }
 
-// NOVA FUNÇÃO: HUD das moedas (garante que está sempre visível)
+// HUD moedas inicial
 function setupCoinHUD() {
   let coinDOM = document.getElementById("coin-score");
   if (!coinDOM) {
@@ -428,239 +370,8 @@ function setupCoinHUD() {
     coinDOM.style.lineHeight = "1.4";
     document.body.appendChild(coinDOM);
   }
-  // Initialize with current values
   const totalCoins = getTotalCoins();
   coinDOM.innerHTML = `🪙 Total: ${totalCoins}<br>Session: +0`;
-}
-
-// NOVO: seletor de skins visuais
-function setupSkinSelector() {
-  const skinDOM = document.getElementById("skin-selector");
-  if (skinDOM) skinDOM.remove();
-}
-
-function setThirdPersonCamera() {
-  // Posição atrás do jogador
-  camera.position.x = player.position.x;
-  camera.position.y = player.position.y - 120;
-  camera.position.z = player.position.z + 60;
-  camera.lookAt(player.position.x, player.position.y, player.position.z + 20);
-}
-
-// Pequena janela de troca de personagem (retângulo maior, preview centralizado)
-function showSmallCharacterWindow() {
-  if (inCustomization) return;
-  inCustomization = true;
-
-  // Overlay maior e centralizado
-  let overlay = document.createElement("div");
-  overlay.id = "character-small-overlay";
-  overlay.style.position = "fixed";
-  overlay.style.top = "50%";
-  overlay.style.left = "50%";
-  overlay.style.transform = "translate(-50%, -50%)";
-  overlay.style.width = "420px";
-  overlay.style.height = "320px";
-  overlay.style.background = "#fff";
-  overlay.style.borderRadius = "18px";
-  overlay.style.boxShadow = "0 0 32px #0005";
-  overlay.style.display = "flex";
-  overlay.style.flexDirection = "row";
-  overlay.style.alignItems = "center";
-  overlay.style.justifyContent = "center";
-  overlay.style.zIndex = "99999";
-  overlay.style.fontFamily = '"Press Start 2P", cursive';
-  document.body.appendChild(overlay);
-
-  // Coluna esquerda: canvas do personagem
-  const left = document.createElement("div");
-  left.style.flex = "0 0 260px";
-  left.style.display = "flex";
-  left.style.flexDirection = "column";
-  left.style.alignItems = "center";
-  left.style.justifyContent = "center";
-  overlay.appendChild(left);
-
-  // Canvas para personagem (maior)
-  const charCanvas = document.createElement("canvas");
-  charCanvas.width = 240;
-  charCanvas.height = 240;
-  charCanvas.style.background = "radial-gradient(circle, #b2e0ff 60%, #3a8dde 100%)";
-  charCanvas.style.borderRadius = "16px";
-  charCanvas.style.boxShadow = "0 0 16px #0004";
-  left.appendChild(charCanvas);
-
-  // Setas
-  const arrows = document.createElement("div");
-  arrows.style.display = "flex";
-  arrows.style.justifyContent = "center";
-  arrows.style.alignItems = "center";
-  arrows.style.marginTop = "18px";
-  left.appendChild(arrows);
-
-  const leftBtn = document.createElement("button");
-  leftBtn.innerText = "←";
-  leftBtn.style.fontSize = "1.5em";
-  leftBtn.style.margin = "0 18px";
-  leftBtn.style.cursor = "pointer";
-  leftBtn.style.background = "#2196f3";
-  leftBtn.style.color = "#fff";
-  leftBtn.style.border = "none";
-  leftBtn.style.borderRadius = "6px";
-  leftBtn.style.width = "40px";
-  leftBtn.style.height = "40px";
-  arrows.appendChild(leftBtn);
-
-  const rightBtn = document.createElement("button");
-  rightBtn.innerText = "→";
-  rightBtn.style.fontSize = "1.5em";
-  rightBtn.style.margin = "0 18px";
-  rightBtn.style.cursor = "pointer";
-  rightBtn.style.background = "#2196f3";
-  rightBtn.style.color = "#fff";
-  rightBtn.style.border = "none";
-  rightBtn.style.borderRadius = "6px";
-  rightBtn.style.width = "40px";
-  rightBtn.style.height = "40px";
-  arrows.appendChild(rightBtn);
-
-  // Coluna direita: nome e fechar
-  const right = document.createElement("div");
-  right.style.flex = "1";
-  right.style.display = "flex";
-  right.style.flexDirection = "column";
-  right.style.alignItems = "flex-start";
-  right.style.justifyContent = "center";
-  right.style.height = "100%";
-  right.style.marginLeft = "18px";
-  overlay.appendChild(right);
-
-  // Nome do skin
-  const skinName = document.createElement("div");
-  skinName.style.fontSize = "1.2em";
-  skinName.style.marginTop = "40px";
-  skinName.style.marginBottom = "12px";
-  skinName.style.color = "#222";
-  skinName.style.textShadow = "1px 1px 0 #fff";
-  right.appendChild(skinName);
-
-  // Botão de fechar (X)
-  const closeBtn = document.createElement("button");
-  closeBtn.innerText = "✕";
-  closeBtn.style.position = "absolute";
-  closeBtn.style.top = "12px";
-  closeBtn.style.right = "18px";
-  closeBtn.style.fontSize = "1.5em";
-  closeBtn.style.background = "transparent";
-  closeBtn.style.color = "#222";
-  closeBtn.style.border = "none";
-  closeBtn.style.cursor = "pointer";
-  closeBtn.style.zIndex = "100001";
-  overlay.appendChild(closeBtn);
-
-  // Estado de skin selecionado
-  let selectedSkin = playerSkins.findIndex(s => s.name === player.currentSkin?.name);
-  if (selectedSkin < 0) selectedSkin = 0;
-  function selectSkin(idx) {
-    if (!getUnlockedSkins()[idx]) return;
-    selectedSkin = idx;
-    setPlayerSkin(idx); // <-- sempre usar o índice
-    setSelectedSkinIndex(idx);
-    skinName.innerText = playerSkins[selectedSkin].name;
-    renderSkinList();
-    renderCharacter();
-  }
-
-  leftBtn.onclick = () => {
-    selectedSkin = (selectedSkin - 1 + playerSkins.length) % playerSkins.length;
-    selectSkin(selectedSkin);
-  };
-  rightBtn.onclick = () => {
-    selectedSkin = (selectedSkin + 1) % playerSkins.length;
-    selectSkin(selectedSkin);
-  };
-
-  closeBtn.onclick = () => {
-    overlay.remove();
-    inCustomization = false;
-  };
-
-  // Renderiza personagem 3D no canvas (ajuste de câmera para cabeça/corpo)
-  let charScene, charCamera, charRenderer;
-  function renderCharacter() {
-    if (!charScene) {
-      charScene = new THREE.Scene();
-      charCamera = new THREE.PerspectiveCamera(45, 320/380, 0.1, 1000);
-      charCamera.position.set(0, -60, 32);
-      charCamera.lookAt(0, 0, 14);
-      charRenderer = new THREE.WebGLRenderer({ canvas: charCanvas, alpha: true, antialias: true });
-      charRenderer.setClearColor(0x000000, 0);
-      charRenderer.setSize(320, 380);
-      const light = new THREE.DirectionalLight(0xffffff, 1.2);
-      light.position.set(0, -40, 60);
-      charScene.add(light);
-      charScene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    }
-    // Limpa modelos antigos (exceto luzes)
-    charScene.children
-      .filter(obj => obj.type !== "DirectionalLight" && obj.type !== "AmbientLight")
-      .forEach(obj => charScene.remove(obj));
-    // Adiciona SEMPRE o modelo preview da skin selecionada
-    const previewModel = createPlayerPreviewModel(playerSkins[selectedSkin]);
-    charScene.add(previewModel);
-    charRenderer.render(charScene, charCamera);
-  }
-
-  // Função para selecionar skin no overlay
-  function selectSkin(idx) {
-    selectedSkin = idx;
-    skinName.innerText = playerSkins[selectedSkin].name;
-    renderSkinList();
-    renderCharacter();
-
-    // Se a skin está bloqueada, mostra cadeado e força o player do jogo para a clássica:
-    if (!unlockedSkins[selectedSkin]) {
-      lockIcon.style.display = "block";
-      setPlayerSkin(0); // Sempre força o player real para a clássica
-      // NÃO chama setSelectedSkinIndex(0) aqui!
-    } else {
-      lockIcon.style.display = "none";
-      setPlayerSkin(selectedSkin); // Só permite aplicar skin desbloqueada
-      setSelectedSkinIndex(selectedSkin); // Só guarda se for desbloqueada!
-    }
-  }
-
-  // Inicializa
-  selectSkin(selectedSkin);
-}
-
-// Botão azul com ícone de pessoa no canto esquerdo
-function setupChangeCharacterButton() {
-  let btn = document.getElementById("change-character-btn");
-  if (!btn) {
-    btn = document.createElement("button");
-    btn.id = "change-character-btn";
-    btn.title = "Change Character";
-    btn.innerHTML = "👤";
-    btn.style.position = "absolute";
-    btn.style.top = "100px";
-    btn.style.left = "20px";
-    btn.style.zIndex = "1002";
-    btn.style.fontSize = "2.2em";
-    btn.style.background = "#2196f3";
-    btn.style.color = "#fff";
-    btn.style.border = "none";
-    btn.style.borderRadius = "50%";
-    btn.style.width = "56px";
-    btn.style.height = "56px";
-    btn.style.display = "flex";
-    btn.style.alignItems = "center";
-    btn.style.justifyContent = "center";
-    btn.style.boxShadow = "0 2px 8px #0003";
-    btn.style.cursor = "pointer";
-    document.body.appendChild(btn);
-    btn.addEventListener("click", showBigCharacterWindow);
-  }
 }
 
 // Adicione esta função para criar uma barra vertical de botões no lado esquerdo
@@ -670,22 +381,22 @@ function setupSidebarButtons() {
     sidebar = document.createElement("div");
     sidebar.id = "sidebar-btns";
     sidebar.style.position = "absolute";
-    sidebar.style.top = "140px"; // Increased from 90px to avoid overlap with life HUD
+    sidebar.style.top = "140px"; 
     sidebar.style.left = "0";
-    sidebar.style.width = "95px"; // Slightly wider
+    sidebar.style.width = "95px"; 
     sidebar.style.background = "rgba(30,40,60,0.85)";
-    sidebar.style.borderRadius = "0 28px 28px 0"; // Increased radius
+    sidebar.style.borderRadius = "0 28px 28px 0";
     sidebar.style.boxShadow = "2px 0 16px #0003";
     sidebar.style.display = "flex";
     sidebar.style.flexDirection = "column";
     sidebar.style.alignItems = "center";
-    sidebar.style.padding = "28px 0"; // Increased padding
-    sidebar.style.gap = "28px"; // Increased gap
+    sidebar.style.padding = "28px 0"; 
+    sidebar.style.gap = "28px"; 
     sidebar.style.zIndex = "1002";
     document.body.appendChild(sidebar);
   }
 
-  // Botão personagem (estilo redondo)
+  // Botão personagem 
   let charBtn = document.getElementById("change-character-btn");
   if (!charBtn) {
     charBtn = document.createElement("button");
@@ -697,8 +408,8 @@ function setupSidebarButtons() {
     charBtn.style.color = "#fff";
     charBtn.style.border = "none";
     charBtn.style.borderRadius = "50%";
-    charBtn.style.width = "60px"; // Increased from 56px
-    charBtn.style.height = "60px"; // Increased from 56px
+    charBtn.style.width = "60px";
+    charBtn.style.height = "60px"; 
     charBtn.style.display = "flex";
     charBtn.style.alignItems = "center";
     charBtn.style.justifyContent = "center";
@@ -738,7 +449,7 @@ function setupSidebarButtons() {
   }
 }
 
-// Função para exibir a loja de power-ups em um retângulo similar ao seletor de personagem.
+// Função para exibir a loja de power-ups 
 function showPowerUpShop() {
   if (document.getElementById("powerup-shop-overlay")) return;
 
@@ -765,7 +476,7 @@ function showPowerUpShop() {
   overlay.classList.add("character-overlay-enter");
   document.body.appendChild(overlay);
 
-  // Efeito de entrada (fade in)
+  // Efeito de entrada 
   setTimeout(() => {
     overlay.style.opacity = "1";
     overlay.classList.remove("character-overlay-enter");
@@ -793,7 +504,7 @@ function showPowerUpShop() {
     overlay.removeEventListener("mousedown", handleOverlayClick);
   }
 
-  // Botão de fechar (X) - mesmo estilo da janela de personagens
+  // Botão de fechar (X) 
   const closeBtn = document.createElement("button");
   closeBtn.innerText = "✕";
   closeBtn.title = "Fechar";
@@ -834,7 +545,7 @@ function showPowerUpShop() {
   };
   overlay.appendChild(closeBtn);
 
-  // Coluna esquerda: preview e informações
+  // Coluna esquerda
   const left = document.createElement("div");
   left.style.flex = "0 0 420px";
   left.style.height = "100%";
@@ -903,7 +614,7 @@ function showPowerUpShop() {
   previewDesc.innerText = "Increases movement speed";
   previewContainer.appendChild(previewDesc);
 
-  // Saldo de moedas (mesmo estilo da janela de personagens)
+  // Saldo de moedas 
   const coinBalance = document.createElement("div");
   coinBalance.style.fontSize = "1.2em";
   coinBalance.style.color = "#f6ad55";
@@ -949,7 +660,6 @@ function showPowerUpShop() {
 
   // Função para renderizar lista de power-ups
   function renderPowerUpList() {
-    // Clear everything except the title
     while (right.children.length > 1) {
       right.removeChild(right.lastChild);
     }
@@ -974,7 +684,6 @@ function showPowerUpShop() {
         ? "0 15px 35px rgba(102,126,234,0.25)"
         : "0 5px 15px rgba(0,0,0,0.08)";
       
-      // Enhanced hover effect
       powerUpBox.onmouseenter = () => {
         if (idx !== selectedPowerUp) {
           powerUpBox.style.transform = "translateY(-3px)";
@@ -990,7 +699,7 @@ function showPowerUpShop() {
         }
       };
       
-      // Icon and name
+      // Nome e icon do power-up
       const iconName = document.createElement("div");
       iconName.style.display = "flex";
       iconName.style.alignItems = "center";
@@ -998,7 +707,6 @@ function showPowerUpShop() {
       iconName.innerHTML = `<span style="font-size:1.8em;margin-right:15px;">${pu.icon}</span> <span style="color:#2d3748;font-size:1.1em;font-weight:600;">${pu.name}</span>`;
       powerUpBox.appendChild(iconName);
 
-      // Permitir clicar para selecionar
       powerUpBox.onclick = () => selectPowerUp(idx);
 
       // Preço
@@ -1051,7 +759,7 @@ function showPowerUpShop() {
           buyBtn.style.background = "linear-gradient(135deg, #4299e1 0%, #3182ce 100%)";
           coinBalance.innerHTML = `🪙 Balance: ${getTotalCoins() + window.currentSessionCoins}`;
           setTimeout(() => {
-            renderPowerUpList(); // Re-render to update affordability
+            renderPowerUpList(); 
           }, 1200);
         }
       };
@@ -1075,10 +783,10 @@ function showPowerUpShop() {
     renderPowerUpList();
   }
 
-  // Inicializar
+  
   selectPowerUp(0);
 
-  // Função para fechar overlay
+  
   function closePowerUpOverlay() {
     overlay.classList.add("character-overlay-exit");
     overlay.style.opacity = "0";
@@ -1088,11 +796,10 @@ function showPowerUpShop() {
     cleanupListeners();
   }
 
-  // Assign to window for external access
   window.closePowerUpOverlay = closePowerUpOverlay;
 }
 
-// Fixed character selection window
+// Função para exibir a janela de personalização do personagem
 function showCharacterWindow() {
   if (inCustomization) return;
   inCustomization = true;
@@ -1120,7 +827,7 @@ function showCharacterWindow() {
   overlay.classList.add("character-overlay-enter");
   document.body.appendChild(overlay);
 
-  // Efeito de entrada (fade in)
+  // Efeito de entrada 
   setTimeout(() => {
     overlay.style.opacity = "1";
     overlay.classList.remove("character-overlay-enter");
@@ -1213,7 +920,7 @@ function showCharacterWindow() {
   previewContainer.style.boxShadow = "0 15px 35px rgba(0,0,0,0.1)";
   left.appendChild(previewContainer);
 
-  // Canvas para personagem (grande)
+  // Canvas para personagem 
   const charCanvas = document.createElement("canvas");
   charCanvas.width = 320;
   charCanvas.height = 380;
@@ -1235,7 +942,7 @@ function showCharacterWindow() {
   lockIcon.style.display = "none";
   previewContainer.appendChild(lockIcon);
 
-  // Nome do skin
+  // Nome da skin
   const skinName = document.createElement("div");
   skinName.style.fontSize = "1.3em";
   skinName.style.marginTop = "25px";
@@ -1299,7 +1006,7 @@ function showCharacterWindow() {
   right.style.padding = "25px 20px";
   overlay.appendChild(right);
 
-  // Add Character Shop title to the right column
+  // Título da loja
   const title = document.createElement("div");
   title.innerText = "Character Shop";
   title.style.fontSize = "1.6em";
@@ -1317,11 +1024,11 @@ function showCharacterWindow() {
 
   // Estado de skin selecionado
   const unlockedSkins = getUnlockedSkins();
-  let selectedSkin = getSelectedSkinIndex(); // <-- usar sempre o guardado
+  let selectedSkin = getSelectedSkinIndex(); 
   if (selectedSkin < 0) selectedSkin = 0;
 
   function renderSkinList() {
-    // Clear everything except the title
+    // Limpa a lista de skins
     while (right.children.length > 1) {
       right.removeChild(right.lastChild);
     }
@@ -1350,7 +1057,7 @@ function showCharacterWindow() {
         ? "0 15px 35px rgba(102,126,234,0.25)"
         : "0 5px 15px rgba(0,0,0,0.08)";
       
-      // Enhanced hover effect
+      // Efeito hover
       skinBox.onmouseenter = () => {
         if (idx !== selectedSkin) {
           skinBox.style.transform = "translateY(-3px)";
@@ -1366,7 +1073,7 @@ function showCharacterWindow() {
         }
       };
       
-      // Icon and name
+      // Nome e ícone da skin
       const iconName = document.createElement("div");
       iconName.style.display = "flex";
       iconName.style.alignItems = "center";
@@ -1378,7 +1085,7 @@ function showCharacterWindow() {
       skinBox.onclick = () => selectSkin(idx);
 
       if (!unlockedSkins[idx]) {
-        // Mostra preço
+        // Mostra o preço
         const price = document.createElement("span");
         price.innerText = `${skinPrices[idx]}🪙`;
         price.style.marginLeft = "auto";
@@ -1414,7 +1121,13 @@ function showCharacterWindow() {
         buyBtn.onclick = (e) => {
           e.stopPropagation();
           if (tryBuySkin(idx)) {
+            // Atualiza imediatamente o array de desbloqueadas e o índice selecionado
+            unlockedSkins[idx] = true;
+            setSelectedSkinIndex(idx);
+            setPlayerSkin(idx);
             renderSkinList();
+            renderCharacter();
+            showSkinPurchaseConfirmation(playerSkins[idx], idx);
           }
         };
         skinBox.appendChild(buyBtn);
@@ -1445,7 +1158,7 @@ function showCharacterWindow() {
   // Mostra o preview de qualquer skin, mas só aplica ao player do jogo se desbloqueada
   function selectSkin(idx) {
     selectedSkin = idx;
-    setSelectedSkinIndex(idx); // <-- guardar sempre a escolha
+    setSelectedSkinIndex(idx); 
     skinName.innerText = playerSkins[selectedSkin].name;
     renderSkinList();
     renderCharacter();
@@ -1478,19 +1191,8 @@ function showCharacterWindow() {
   }
   document.addEventListener("keydown", escListener);
 
-  // Remove listeners ao fechar
-  function cleanupListeners() {
-    document.removeEventListener("keydown", escListener);
-    overlay.removeEventListener("mousedown", handleOverlayClick);
-  }
 
-  // Substitua closeBtn.onclick e overlay.remove por:
-  function closeOverlayWithEffectAndCleanup() {
-    closeOverlayWithEffect();
-    cleanupListeners();
-  }
-
-  // Renderiza personagem 3D no canvas (ajuste de câmera para corpo/cabeça, mais próximo)
+  // Renderiza personagem 3D no canvas 
   let charScene, charCamera, charRenderer;
   function renderCharacter() {
     if (!charScene) {
@@ -1507,21 +1209,21 @@ function showCharacterWindow() {
       charScene.add(light);
       charScene.add(new THREE.AmbientLight(0xffffff, 0.7));
     }
-    // Limpa modelos antigos (exceto luzes)
+    // Limpa modelos antigos 
     charScene.children
       .filter(obj => obj.type !== "DirectionalLight" && obj.type !== "AmbientLight")
       .forEach(obj => charScene.remove(obj));
-    // Adiciona SEMPRE o modelo preview da skin selecionada
+    // Adiciona smepre o modelo preview da skin selecionada
     const previewModel = createPlayerPreviewModel(playerSkins[selectedSkin]);
     charScene.add(previewModel);
     charRenderer.render(charScene, charCamera);
   }
 
-  // Inicializa
+  
   selectSkin(selectedSkin);
 }
 
-// Adicione CSS para animação de entrada/saída do overlay
+// Adicione  animação de entrada/saída do overlay
 if (!document.getElementById("character-overlay-style")) {
   const style = document.createElement("style");
   style.id = "character-overlay-style";
@@ -1544,9 +1246,10 @@ if (!document.getElementById("character-overlay-style")) {
   document.head.appendChild(style);
 }
 
-// Bloqueia input enquanto o overlay está ativo
+// Bloqueia input enquanto overlay ativo
 window.isStartOverlayActive = () => startActive;
 
+// Ciclo de animação principal
 function animate() {
   animateVehicles();
   animatePlayer();
@@ -1554,16 +1257,10 @@ function animate() {
   animatePortal();
   coinCatch();
   hitTest();
-
-  // Atualize a posição da sombra para ser fixa
   updateShadowPosition();
-
-  // Update magnet effects if active
   if (window.activeMagnetEffect) {
     window.activeMagnetEffect();
   }
-
-  // Atualize o comportamento da câmera
   if (thirdPerson) {
     setThirdPersonCamera();
   } else if (player.position.y >= 0) {
@@ -1575,64 +1272,52 @@ function animate() {
     camera.position.set(300, -300, 300);
     camera.lookAt(0, 0, 0);
   }
-
-  // Detecta transição de qualquer linha < 0 para linha 0 (linha de partida)
-  const currentRow = Math.round(player.position.y / 65); // tileSize fixo
+  const currentRow = Math.round(player.position.y / 65);
   if (lastRow < 0 && currentRow === 0 && !startActive) {
     showStartOverlay();
-
-    // Desabilita os botões ao cruzar a linha de partida
     const charBtn = document.getElementById("change-character-btn");
     const puBtn = document.getElementById("powerup-btn");
     if (charBtn) {
       charBtn.disabled = true;
       charBtn.style.opacity = "0.5";
       charBtn.style.cursor = "not-allowed";
-      charBtn.style.background = "#666"; // Cinza desabilitado
+      charBtn.style.background = "#666";
     }
     if (puBtn) {
       puBtn.disabled = true;
       puBtn.style.opacity = "0.5";
       puBtn.style.cursor = "not-allowed";
-      puBtn.style.background = "#666"; // Cinza desabilitado
+      puBtn.style.background = "#666";
     }
-    
-    // Habilita os botões de superpoderes
     updateSuperpowerButtonStates(false);
-    
   } else if (lastRow === 0 && currentRow < 0) {
-    // Reabilita os botões ao voltar para antes da linha de partida
     const charBtn = document.getElementById("change-character-btn");
     const puBtn = document.getElementById("powerup-btn");
     if (charBtn) {
       charBtn.disabled = false;
       charBtn.style.opacity = "1";
       charBtn.style.cursor = "pointer";
-      charBtn.style.background = "#2196f3"; // Azul habilitado
+      charBtn.style.background = "#2196f3";
     }
     if (puBtn) {
       puBtn.disabled = false;
       puBtn.style.opacity = "1";
       puBtn.style.cursor = "pointer";
-      puBtn.style.background = "#2196f3"; // Azul habilitado
+      puBtn.style.background = "#2196f3";
     }
-    
-    // Desabilita os botões de superpoderes
     updateSuperpowerButtonStates(true);
   }
   lastRow = currentRow;
-
   renderer.render(scene, camera);
 }
 
-// Corrija a função showStartOverlay para salvar moedas antes de começar novo jogo
+// Mostra overlay de início e inicia novo jogo
 function showStartOverlay() {
   const startOverlay = document.getElementById("start-overlay");
   if (!startOverlay) return;
   startActive = true;
   startOverlay.style.visibility = "visible";
   startOverlay.style.opacity = "1";
-  // Inicia nova partida quando o overlay aparece (isso vai salvar moedas da partida anterior)
   startGame();
   setTimeout(() => {
     startOverlay.style.opacity = "0";
@@ -1640,16 +1325,15 @@ function showStartOverlay() {
       startOverlay.style.visibility = "hidden";
       startActive = false;
     }, 400);
-  }, 1000); // Mostra por 1 segundo
+  }, 1000);
 }
 
-// Atualize o HUD da pontuação sempre que o score mudar
+// Atualiza HUD score
 export function updateScoreHUD(newScore) {
   let scoreDOM = document.getElementById("score-hud");
   if (scoreDOM) {
     scoreDOM.innerText = `🏁: ${newScore}`;
   }
-  // Verifica bônus por score
   checkScoreBonus(newScore);
 }
 window.updateScoreHUD = updateScoreHUD;
@@ -1657,24 +1341,21 @@ window.updateScoreHUD = updateScoreHUD;
 // Adicione esta função utilitária para chamar o bônus manualmente
 import { coinCatch as coinCatchModule } from "./CoinCatch";
 function checkMilestoneBonusesAfterTeleport() {
-  // Chama a função de bônus de moedas (ela é idempotente)
+  
   if (typeof coinCatchModule === "function") {
     coinCatchModule();
   }
 }
 
-// No animatePlayer.js, após teletransporte, chame checkMilestoneBonusesAfterTeleport
-// Mas como não temos acesso direto, faça isso via window no animatePlayer.js
+// Verifica bônus de moedas após teleporte
 window.checkMilestoneBonusesAfterTeleport = checkMilestoneBonusesAfterTeleport;
 
-// --- Ao terminar o jogo, salve as moedas coletadas ---
 function saveCoinsOnGameOver() {
-  endGame(); // Soma moedas da sessão ao total guardado
+  endGame(); 
 }
 
-// Enhanced game over screen with revival option
+// Função para mostrar a tela de game over
 window.showGameOverScreen = function() {
-  // PRIMEIRO salva as moedas antes de mostrar o game over
   saveCoinsOnGameOver();
   
   const result = document.getElementById("result-container");
@@ -1683,57 +1364,199 @@ window.showGameOverScreen = function() {
     result.style.display = "flex";
     result.style.visibility = "visible";
     
-    // Add revival button if player has extra lives
     addRevivalButton(result);
   }
-  // Atualize a pontuação final se possível
+  // Atualize a pontuação final 
   if (finalScore && typeof window.position === "object" && typeof window.position.currentRow === "number") {
     finalScore.innerText = window.position.currentRow.toString();
   }
 };
 
 function addRevivalButton(resultContainer) {
-  // Remove existing revival button if any
-  const existingBtn = document.getElementById("revival-btn");
-  if (existingBtn) existingBtn.remove();
   
+  const existingPanel = document.getElementById("revival-panel");
+  if (existingPanel) existingPanel.remove();
+  const existingOverlay = document.getElementById("revival-blocker-overlay");
+  if (existingOverlay) existingOverlay.remove();
+
   const extraLives = getExtraLives();
-  if (extraLives <= 0) return; // No lives available
-  
-  // Create revival button
-  const revivalBtn = document.createElement("button");
-  revivalBtn.id = "revival-btn";
-  revivalBtn.innerHTML = `❤️ Revive (${extraLives} lives)`;
-  revivalBtn.style.fontSize = "1.2em";
-  revivalBtn.style.padding = "12px 24px";
-  revivalBtn.style.margin = "20px";
-  revivalBtn.style.background = "#ff4081";
-  revivalBtn.style.color = "white";
-  revivalBtn.style.border = "none";
-  revivalBtn.style.borderRadius = "8px";
-  revivalBtn.style.cursor = "pointer";
-  revivalBtn.style.fontFamily = '"Press Start 2P", cursive';
-  revivalBtn.style.boxShadow = "0 4px 8px rgba(0,0,0,0.3)";
-  revivalBtn.style.transition = "background 0.2s";
-  
-  revivalBtn.onmouseenter = () => revivalBtn.style.background = "#e91e63";
-  revivalBtn.onmouseleave = () => revivalBtn.style.background = "#ff4081";
-  
-  revivalBtn.onclick = () => {
+  if (extraLives <= 0) return;
+
+  // Cria overlay transparente para bloquear interação
+  const blocker = document.createElement("div");
+  blocker.id = "revival-blocker-overlay";
+  blocker.style.position = "fixed";
+  blocker.style.top = "0";
+  blocker.style.left = "0";
+  blocker.style.width = "100vw";
+  blocker.style.height = "100vh";
+  blocker.style.background = "rgba(0,0,0,0.25)";
+  blocker.style.zIndex = "10000";
+  blocker.style.pointerEvents = "auto";
+  document.body.appendChild(blocker);
+
+  // Centraliza o resultContainer no ecrã
+  resultContainer.style.position = "fixed";
+  resultContainer.style.top = "50%";
+  resultContainer.style.left = "50%";
+  resultContainer.style.transform = "translate(-50%, -50%)";
+  resultContainer.style.zIndex = "10000";
+  resultContainer.style.display = "flex";
+  resultContainer.style.flexDirection = "column";
+  resultContainer.style.alignItems = "center";
+  resultContainer.style.justifyContent = "center";
+
+  // Cria o painel reviver 
+  const revivalPanel = document.createElement("div");
+  revivalPanel.id = "revival-panel";
+  revivalPanel.style.position = "fixed";
+  revivalPanel.style.top = "50%";
+  revivalPanel.style.left = "50%";
+  revivalPanel.style.transform = "translate(-50%, -50%)";
+  revivalPanel.style.background = "#ff5ca7";
+  revivalPanel.style.borderRadius = "18px";
+  revivalPanel.style.padding = "32px 28px";
+  revivalPanel.style.display = "flex";
+  revivalPanel.style.flexDirection = "column";
+  revivalPanel.style.alignItems = "center";
+  revivalPanel.style.minWidth = "260px";
+  revivalPanel.style.boxShadow = "0 4px 24px #0004";
+  revivalPanel.style.zIndex = "10001";
+  revivalPanel.style.transition = "transform 0.5s cubic-bezier(.4,2,.6,1)";
+  // Barra de tempo 
+  const duration = 7000; // ms
+  const timerBar = document.createElement("div");
+  timerBar.style.width = "100%";
+  timerBar.style.height = "16px";
+  timerBar.style.background = "#fff2";
+  timerBar.style.borderRadius = "8px";
+  timerBar.style.marginBottom = "18px";
+  timerBar.style.overflow = "hidden";
+  const timerFill = document.createElement("div");
+  timerFill.style.height = "100%";
+  timerFill.style.width = "100%";
+  timerFill.style.background = "linear-gradient(90deg, #ffb6e6, #ff2e7e)";
+  timerFill.style.transition = "width 0.2s linear";
+  timerBar.appendChild(timerFill);
+  revivalPanel.appendChild(timerBar);
+
+  // Conteúdo reviver
+  const content = document.createElement("div");
+  content.style.display = "flex";
+  content.style.flexDirection = "column";
+  content.style.alignItems = "center";
+
+  // Imagem de coração
+  const heart = document.createElement("div");
+  heart.innerHTML = "❤️";
+  heart.style.fontSize = "3em";
+  heart.style.marginBottom = "12px";
+  content.appendChild(heart);
+
+  // Texto reviver
+  const text = document.createElement("div");
+  text.innerText = "Revive Player?";
+  text.style.fontFamily = '"Press Start 2P", cursive';
+  text.style.color = "#fff";
+  text.style.fontSize = "1.3em";
+  text.style.fontWeight = "bold";
+  text.style.marginBottom = "18px";
+  text.style.textAlign = "center";
+  text.style.textShadow = "1px 1px 2px #0005";
+  content.appendChild(text);
+
+  // Botões "Sim" e "Não"
+  const btnRow = document.createElement("div");
+  btnRow.style.display = "flex";
+  btnRow.style.flexDirection = "row";
+  btnRow.style.gap = "18px";
+  btnRow.style.marginTop = "8px";
+
+  // Botão verde "Sim"
+  const btnSim = document.createElement("button");
+  btnSim.innerText = "Yes";
+  btnSim.style.background = "#2ecc40";
+  btnSim.style.color = "#fff";
+  btnSim.style.fontSize = "1.1em";
+  btnSim.style.fontWeight = "bold";
+  btnSim.style.border = "none";
+  btnSim.style.borderRadius = "8px";
+  btnSim.style.padding = "10px 36px";
+  btnSim.style.cursor = "pointer";
+  btnSim.style.boxShadow = "0 2px 8px #0002";
+  btnSim.style.transition = "background 0.2s";
+  btnSim.onmouseenter = () => btnSim.style.background = "#27ae38";
+  btnSim.onmouseleave = () => btnSim.style.background = "#2ecc40";
+  btnSim.onclick = () => {
     revivePlayer();
+    if (revivalPanel.parentNode) revivalPanel.parentNode.removeChild(revivalPanel);
   };
-  
-  // Insert before restart button
-  const restartBtn = resultContainer.querySelector("#restart");
-  if (restartBtn) {
-    resultContainer.insertBefore(revivalBtn, restartBtn);
-  } else {
-    resultContainer.appendChild(revivalBtn);
+  btnRow.appendChild(btnSim);
+
+  // Botão vermelho "Não"
+  const btnNao = document.createElement("button");
+  btnNao.innerText = "No";
+  btnNao.style.background = "#e74c3c";
+  btnNao.style.color = "#fff";
+  btnNao.style.fontSize = "1.1em";
+  btnNao.style.fontWeight = "bold";
+  btnNao.style.border = "none";
+  btnNao.style.borderRadius = "8px";
+  btnNao.style.padding = "10px 36px";
+  btnNao.style.cursor = "pointer";
+  btnNao.style.boxShadow = "0 2px 8px #0002";
+  btnNao.style.transition = "background 0.2s";
+  btnNao.onmouseenter = () => btnNao.style.background = "#c0392b";
+  btnNao.onmouseleave = () => btnNao.style.background = "#e74c3c";
+  btnNao.onclick = () => {
+    if (revivalPanel.parentNode) revivalPanel.parentNode.removeChild(revivalPanel);
+  };
+  btnRow.appendChild(btnNao);
+
+  content.appendChild(btnRow);
+  revivalPanel.appendChild(content);
+
+  // Adiciona o painel revival ao body (acima do overlay)
+  document.body.appendChild(revivalPanel);
+
+  // Barra de tempo decrescente
+  let start = Date.now();
+  let expired = false;
+  function updateTimer() {
+    let elapsed = Date.now() - start;
+    let percent = Math.max(0, 1 - elapsed / duration);
+    timerFill.style.width = (percent * 100) + "%";
+    if (percent > 0 && !expired) {
+      requestAnimationFrame(updateTimer);
+    } else {
+      btnSim.disabled = true;
+      btnSim.style.opacity = 0.5;
+      btnNao.disabled = true;
+      btnNao.style.opacity = 0.5;
+      expired = true;
+      setTimeout(() => {
+        if (revivalPanel.parentNode) revivalPanel.parentNode.removeChild(revivalPanel);
+        if (blocker.parentNode) blocker.parentNode.removeChild(blocker);
+      }, 600);
+    }
   }
+  updateTimer();
+
+  // Ao clicar em Sim ou Não, remove o revivalPanel e o overlay
+  btnSim.onclick = () => {
+    revivePlayer();
+    if (revivalPanel.parentNode) revivalPanel.parentNode.removeChild(revivalPanel);
+    if (blocker.parentNode) blocker.parentNode.removeChild(blocker);
+  };
+  btnNao.onclick = () => {
+    if (revivalPanel.parentNode) revivalPanel.parentNode.removeChild(revivalPanel);
+    if (blocker.parentNode) blocker.parentNode.removeChild(blocker);
+  };
 }
 
+// Função para exibir a animação de reviver
 function showRevivalAnimation() {
-  // Create revival effect overlay
+  
   const revivalOverlay = document.createElement("div");
   revivalOverlay.style.position = "fixed";
   revivalOverlay.style.top = "0";
@@ -1748,7 +1571,6 @@ function showRevivalAnimation() {
   revivalOverlay.style.animation = "revivalPulse 2s ease-in-out";
   revivalOverlay.style.pointerEvents = "none";
   
-  // Add CSS animation if not exists
   if (!document.getElementById("revival-animation-style")) {
     const style = document.createElement("style");
     style.id = "revival-animation-style";
@@ -1771,7 +1593,7 @@ function showRevivalAnimation() {
     document.head.appendChild(style);
   }
   
-  // Add revival text with heart animation
+  // Texto de reviver
   const revivalText = document.createElement("div");
   revivalText.innerHTML = "❤️ REVIVED ❤️";
   revivalText.style.fontSize = "4em";
@@ -1781,7 +1603,7 @@ function showRevivalAnimation() {
   revivalText.style.animation = "heartBeat 0.8s ease-in-out infinite, revivalGlow 1s ease-in-out infinite";
   revivalText.style.textAlign = "center";
   
-  // Add shield activation text
+  // Texto de escudo
   const shieldText = document.createElement("div");
   shieldText.innerHTML = "🛡️ SHIELD ACTIVATED 🛡️";
   shieldText.style.fontSize = "2em";
@@ -1792,7 +1614,7 @@ function showRevivalAnimation() {
   shieldText.style.animation = "revivalGlow 1.2s ease-in-out infinite";
   shieldText.style.textAlign = "center";
   
-  // Container for text
+  // Container para os textos
   const textContainer = document.createElement("div");
   textContainer.style.display = "flex";
   textContainer.style.flexDirection = "column";
@@ -1818,18 +1640,16 @@ function revivePlayer() {
     return;
   }
   
-  // Use one extra life
+  // Usa uma vida extra
   if (!useExtraLife()) {
     console.log("Failed to use extra life!");
     return;
   }
   
-  // Update life HUD
   updateLifeHUD();
   
-  // Reset game state first
+  // Faz reset do jogo
   import("./components/Player").then(({ setGameOver, player, position }) => {
-    // Reset game over state
     setGameOver(false);
     
     // Hide game over screen
@@ -1839,10 +1659,9 @@ function revivePlayer() {
       result.style.visibility = "hidden";
     }
     
-    // Show revival animation immediately
     showRevivalAnimation();
     
-    // Activate shield protection for revival (3 seconds) - start imediatamente
+
     activateRevivalShield(player, scene, 3000);
     
     // Update score HUD
@@ -1855,11 +1674,11 @@ function revivePlayer() {
 }
 
 function activateRevivalShield(player, scene, duration = 3000) {
-  // Set shield state
+  // Verifica se o jogador já tem um escudo ativo
   player.userData.hasShield = true;
   player.userData.shieldActive = true;
   
-  // Create shield visual effect
+  // Cria o escudo visual
   const shieldGeometry = new THREE.SphereGeometry(25, 32, 32);
   const shieldMaterial = new THREE.MeshBasicMaterial({
     color: 0x00ff88,
@@ -1872,7 +1691,7 @@ function activateRevivalShield(player, scene, duration = 3000) {
   shield.name = "revivalShield";
   scene.add(shield);
   
-  // Shield animation
+  // Animação do escudo
   let time = 0;
   const startTime = Date.now();
   
@@ -1886,11 +1705,11 @@ function activateRevivalShield(player, scene, duration = 3000) {
       shield.rotation.y += 0.03;
       shield.rotation.x += 0.02;
       
-      // Pulsing effect
+      
       const pulse = 1 + Math.sin(time) * 0.15;
       shield.scale.setScalar(pulse);
       
-      // Fade out in last 500ms
+
       if (elapsed > duration - 500) {
         const fadeProgress = (elapsed - (duration - 500)) / 500;
         shield.material.opacity = 0.4 * (1 - fadeProgress);
@@ -1898,7 +1717,7 @@ function activateRevivalShield(player, scene, duration = 3000) {
       
       requestAnimationFrame(animateShield);
     } else {
-      // Remove shield
+      // Remove o escudo 
       scene.remove(shield);
       player.userData.hasShield = false;
       player.userData.shieldActive = false;
@@ -1910,7 +1729,7 @@ function activateRevivalShield(player, scene, duration = 3000) {
   console.log(`Revival shield activated for ${duration/1000} seconds`);
 }
 
-// --- EFEITO VISUAL DO PORTAL (overlay roxo ondulado) ---
+// Efeito visual do portal 
 window.showPortalTeleportEffect = function(duration = 1500) {
   // Remove overlay antigo se existir
   let overlay = document.getElementById("portal-teleport-overlay");
@@ -1934,12 +1753,12 @@ window.showPortalTeleportEffect = function(duration = 1500) {
   overlay.style.backdropFilter = "blur(8px)";
   document.body.appendChild(overlay);
 
-  // Animação de opacidade (fade in/out)
+  // Animação de opacidade 
   setTimeout(() => { overlay.style.opacity = "1"; }, 10);
   setTimeout(() => { overlay.style.opacity = "0"; }, duration - 200);
   setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, duration);
 
-  // Onda animada (opcional, para dar efeito ondulado)
+  // Onda animada 
   if (!document.getElementById("portal-teleport-effect-style")) {
     const style = document.createElement("style");
     style.id = "portal-teleport-effect-style";
@@ -1953,6 +1772,7 @@ window.showPortalTeleportEffect = function(duration = 1500) {
         100% { filter: blur(8px) brightness(1); }
       }
     `;
-    document.head.appendChild(style);
+       document.head.appendChild(style);
   }
-};
+ }
+

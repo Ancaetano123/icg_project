@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import { tileSize } from "../constants";
 
+// Caminhão
 export function Truck(initialTileIndex, color, direction = true) {
   const truck = new THREE.Group();
   truck.position.x = initialTileIndex * tileSize;
 
-  // Cabine do caminhão
+  // Cabine
   const cabin = new THREE.Mesh(
     new THREE.BoxGeometry(30, 30, 30),
     new THREE.MeshLambertMaterial({ color, flatShading: true })
@@ -16,7 +17,7 @@ export function Truck(initialTileIndex, color, direction = true) {
   cabin.receiveShadow = true;
   truck.add(cabin);
 
-  // Carga do caminhão
+  // Carga
   const cargo = new THREE.Mesh(
     new THREE.BoxGeometry(70, 35, 35),
     new THREE.MeshLambertMaterial({
@@ -30,8 +31,8 @@ export function Truck(initialTileIndex, color, direction = true) {
   cargo.receiveShadow = true;
   truck.add(cargo);
 
-  // Faróis (cilindros na frente da cabine)
-  const headlightMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 }); // Amarelo
+  // Faróis
+  const headlightMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
   const headlightGeometry = new THREE.CylinderGeometry(3, 3, 5, 8);
 
   const leftHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
@@ -44,8 +45,8 @@ export function Truck(initialTileIndex, color, direction = true) {
   rightHeadlight.position.set(50, 10, 15);
   truck.add(rightHeadlight);
 
-  // Retrovisores (cubos e cilindros nas laterais)
-  const mirrorMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 }); // Preto
+  // Retrovisores
+  const mirrorMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
   const mirrorBaseGeometry = new THREE.BoxGeometry(2, 2, 5);
   const mirrorGeometry = new THREE.CylinderGeometry(1, 1, 3, 8);
 
@@ -67,7 +68,7 @@ export function Truck(initialTileIndex, color, direction = true) {
   rightMirror.position.set(30, 20, 20);
   truck.add(rightMirror);
 
-  // Adicionar rodas
+  // Rodas
   import("./Wheel").then(({ Wheel }) => {
     const frontWheel = Wheel(18);
     truck.add(frontWheel);
@@ -76,7 +77,7 @@ export function Truck(initialTileIndex, color, direction = true) {
     truck.add(backWheel);
   });
 
-  // Inverte o caminhão se direção for para a esquerda
+  // Inverter direção
   if (direction === false) {
     truck.scale.x = -1;
   }

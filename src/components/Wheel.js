@@ -1,5 +1,6 @@
 import * as THREE from "three";
 
+//Roda dos veiculos
 export function Wheel(x) {
   const wheel = new THREE.Mesh(
     new THREE.BoxGeometry(12, 33, 12),

@@ -1,28 +1,24 @@
 import * as THREE from "three";
 import { minTileIndex, maxTileIndex } from "../constants";
 
-// --- Coin probability is now managed here as a module variable ---
-export let coinProbability = 0.2; // Valor reduzido para menos moedas
+// Probabilidade de moeda
+export let coinProbability = 0.2; 
 export function setCoinProbability(prob) {
-  coinProbability = Math.max(0, Math.min(1, prob)); // Garante que fica entre 0 e 1
+  coinProbability = Math.max(0, Math.min(1, prob));
 }
-
-// Ajuste: probabilidade de portal aumentada significativamente
-const PORTAL_PROBABILITY = 0.08; // Aumentado de 0.01 para 0.08 - mais portais
+// Probabilidade de portal
+const PORTAL_PROBABILITY = 0.08; 
 
 export function generateRows(amount) {
   const rows = [];
   for (let i = 0; i < amount; i++) {
-    // Não gera moeda nem portal nas primeiras 3 linhas (i < 3)
+    // Não gera moeda nem portal nas primeiras 3 linhas
     const allowSpecials = i >= 3;
     const placeCoin = allowSpecials && Math.random() < coinProbability;
     const placePortal = allowSpecials && Math.random() < PORTAL_PROBABILITY;
-    
-    // Debug: log quando um portal é gerado
     if (placePortal) {
       console.log(`Portal gerado na linha ${i}`);
     }
-    
     const rowData = generateRow(placeCoin, placePortal);
     rows.push(rowData);
   }
@@ -55,7 +51,6 @@ function generateForesMetadata(placeCoin = false, placePortal = false) {
     return { tileIndex, type, height };
   });
 
-  // Só tenta adicionar moeda se placeCoin for true
   let coin = null;
   if (placeCoin) {
     let coinTileIndex;
@@ -70,11 +65,10 @@ function generateForesMetadata(placeCoin = false, placePortal = false) {
     }
   }
 
-  // --- Portal mais frequente ---
   let portal = null;
   if (placePortal) {
     const direction = randomElement(["forward", "backward"]);
-    const offset = THREE.MathUtils.randInt(10, 30); // Entre 10 e 30 linhas
+    const offset = THREE.MathUtils.randInt(10, 30);
     let portalTileIndex;
     let tries = 0;
     do {
@@ -127,7 +121,6 @@ function generateCarLaneMetadata(placeCoin = false, placePortal = false) {
     }
   }
 
-  // --- Portal mais frequente ---
   let portal = null;
   if (placePortal) {
     const direction = randomElement(["forward", "backward"]);
@@ -184,7 +177,6 @@ function generateTruckLaneMetadata(placeCoin = false, placePortal = false) {
     }
   }
 
-  // --- Portal mais frequente ---
   let portal = null;
   if (placePortal) {
     const direction = randomElement(["forward", "backward"]);
